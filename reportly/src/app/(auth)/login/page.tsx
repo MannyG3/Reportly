@@ -1,7 +1,9 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { getBrowserSupabaseClient } from "@/lib/supabase/client";
+
 interface LoginFormState {
   email: string;
   password: string;
@@ -9,16 +11,21 @@ interface LoginFormState {
 
 export default function LoginPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const [form, setForm] = useState<LoginFormState>({ email: "", password: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [redirectTo, setRedirectTo] = useState("/dashboard");
 
-  const redirectTo = searchParams.get("redirect") || "/dashboard";
+  useEffect(() => {
+    const redirect = new URLSearchParams(window.location.search).get("redirect");
+    if (redirect) {
+      setRedirectTo(redirect);
+    }
+  }, []);
 
   const handleChange =
-    (field: keyof LoginFormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    (field: keyof LoginFormState) => (e: ChangeEvent<HTMLInputElement>) => {
       setForm((prev) => ({ ...prev, [field]: e.target.value }));
     };
 
@@ -53,6 +60,7 @@ export default function LoginPage() {
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Verify session is established
+      const supabase = getBrowserSupabaseClient();
       const {
         data: { session },
       } = await supabase.auth.getSession();

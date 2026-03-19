@@ -3,9 +3,16 @@ import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2025-01-27.acpi",
-});
+function getStripeClient() {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey) {
+    throw new Error("Missing STRIPE_SECRET_KEY");
+  }
+
+  return new Stripe(secretKey, {
+    apiVersion: "2026-02-25.clover",
+  });
+}
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
 
@@ -21,6 +28,7 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
  * - invoice.payment_failed
  */
 export async function POST(req: NextRequest) {
+  const stripe = getStripeClient();
   const body = await req.text();
   const signature = req.headers.get("stripe-signature");
 
@@ -84,8 +92,10 @@ export async function POST(req: NextRequest) {
             | "pro"
             | "enterprise") || "starter";
 
-          const currentPeriodEnd = subscription.current_period_end
-            ? new Date(subscription.current_period_end * 1000).toISOString()
+          const periodEndUnix = (subscription as { current_period_end?: number })
+            .current_period_end;
+          const currentPeriodEnd = periodEndUnix
+            ? new Date(periodEndUnix * 1000).toISOString()
             : null;
 
           const { error: updateError } = await supabase

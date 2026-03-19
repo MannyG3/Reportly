@@ -1,13 +1,8 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-<<<<<<<< HEAD:src/app/(auth)/signup/page.tsx
-import { getBrowserSupabaseClient } from "@/lib/supabase/client";
 import { completeSignup } from "./actions";
-
-========
->>>>>>>> e9730c1 (Fix auth flow and app routing):reportly/src/app/(auth)/signup/page.tsx
 interface SignupFormState {
   agencyName: string;
   email: string;
@@ -26,7 +21,7 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleChange =
-    (field: keyof SignupFormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    (field: keyof SignupFormState) => (e: ChangeEvent<HTMLInputElement>) => {
       setForm((prev) => ({ ...prev, [field]: e.target.value }));
     };
 
@@ -53,12 +48,14 @@ export default function SignupPage() {
       });
 
       const payload = (await res.json().catch(() => null)) as
-        | { ok: true }
+        | { ok: true; agencyId: string }
         | { error: string };
 
       if (!res.ok) {
         throw new Error(payload && "error" in payload ? payload.error : "Unable to sign up.");
       }
+
+      const agencyId = payload && "ok" in payload && payload.ok ? payload.agencyId : null;
 
       const email = form.email.trim().toLowerCase();
       const loginRes = await fetch("/api/auth/login", {
@@ -79,17 +76,17 @@ export default function SignupPage() {
         );
       }
 
-      // 4) Create Stripe subscription (server-side for security)
-      const signupResult = await completeSignup(
-        agency.id,
-        form.email.trim().toLowerCase(),
-        form.agencyName.trim()
-      );
+      // Best effort subscription provisioning. Account creation should still succeed.
+      if (agencyId) {
+        const signupResult = await completeSignup(
+          agencyId,
+          email,
+          form.agencyName.trim()
+        );
 
-      if (!signupResult.success) {
-        console.error("Subscription creation failed:", signupResult.error);
-        // Don't fail signup if Stripe fails - account is already created
-        // User can retry subscription setup from settings
+        if (!signupResult.success) {
+          console.error("Subscription creation failed:", signupResult.error);
+        }
       }
 
       router.push("/dashboard");

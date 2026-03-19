@@ -46,24 +46,11 @@ export default async function DashboardHomePage() {
     const startOfNextMonth = new Date(
       Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1, 0, 0, 0)
     );
-
-<<<<<<<< HEAD:src/app/(dashboard)/dashboard/page.tsx
-    // Use Promise.race with timeout
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(
-        () => reject(new Error("Database query timeout")),
-        10000 // 10 second timeout
-      )
-    );
-
-    const statsPromise = Promise.all([
-========
     const [
       { count: totalClients, error: clientsError },
       { count: totalReports, error: reportsError },
       { count: reportsThisMonth, error: monthError },
     ] = await Promise.all([
->>>>>>>> e9730c1 (Fix auth flow and app routing):reportly/src/app/(dashboard)/dashboard/page.tsx
       supabase
         .from("clients")
         .select("id", { count: "exact", head: true })
@@ -80,18 +67,6 @@ export default async function DashboardHomePage() {
         .gte("generated_at", startOfMonth.toISOString())
         .lt("generated_at", startOfNextMonth.toISOString()),
     ]);
-<<<<<<<< HEAD:src/app/(dashboard)/dashboard/page.tsx
-
-    const [
-      { count: totalClients, error: clientsError },
-      { count: totalReports, error: reportsError },
-      { count: reportsThisMonth, error: monthError },
-    ] = (await Promise.race([
-      statsPromise,
-      timeoutPromise,
-    ])) as typeof [any, any, any];
-========
->>>>>>>> e9730c1 (Fix auth flow and app routing):reportly/src/app/(dashboard)/dashboard/page.tsx
 
     if (clientsError) throw clientsError;
     if (reportsError) throw reportsError;

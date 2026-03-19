@@ -72,7 +72,7 @@ async function provisionAction(formData: FormData) {
 
   if (userRowError) {
     // rollback agency
-    await admin.from("agencies").delete().eq("id", agencyId).catch(() => null);
+    await admin.from("agencies").delete().eq("id", agencyId);
     redirect("/setup?error=Unable%20to%20create%20user%20profile");
   }
 

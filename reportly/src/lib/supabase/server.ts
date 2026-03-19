@@ -30,14 +30,17 @@ export async function createSupabaseServerClient(): Promise<TypedSupabaseClient>
       },
     },
     cookies: {
-      get(name: string) {
-        return cookieStore.get(name)?.value;
+      getAll() {
+        return cookieStore.getAll();
       },
-      set(name: string, value: string, options: Parameters<typeof cookieStore.set>[1]) {
-        cookieStore.set(name, value, options);
-      },
-      remove(name: string, options: Parameters<typeof cookieStore.set>[1]) {
-        cookieStore.set(name, "", { ...options, maxAge: 0 });
+      setAll(cookiesToSet) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
+        } catch {
+          // Ignore cookie mutations in contexts where response cookies are immutable.
+        }
       },
     },
   });

@@ -2,9 +2,16 @@ import Stripe from "stripe";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2025-01-27.acpi",
-});
+function getStripeClient() {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey) {
+    throw new Error("Missing STRIPE_SECRET_KEY");
+  }
+
+  return new Stripe(secretKey, {
+    apiVersion: "2026-02-25.clover",
+  });
+}
 
 /**
  * Create a Stripe customer and subscription for a new agency.
@@ -22,6 +29,7 @@ export async function createSubscriptionForAgency(
   plan: "starter" | "pro" | "enterprise" = "starter"
 ) {
   try {
+    const stripe = getStripeClient();
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -71,6 +79,9 @@ export async function createSubscriptionForAgency(
       automatic_tax: { enabled: true },
     });
 
+    const periodEndUnix = (subscription as { current_period_end?: number })
+      .current_period_end;
+
     // 4. Save subscription to Supabase
     const { data: savedSubscription, error: saveError } = await supabase
       .from("subscriptions")
@@ -80,8 +91,8 @@ export async function createSubscriptionForAgency(
         stripe_subscription_id: subscription.id,
         plan,
         status: subscription.status as any,
-        current_period_end: subscription.current_period_end
-          ? new Date(subscription.current_period_end * 1000).toISOString()
+        current_period_end: periodEndUnix
+          ? new Date(periodEndUnix * 1000).toISOString()
           : null,
       })
       .select()
@@ -145,6 +156,7 @@ export async function updateSubscriptionPlan(
   newPlan: "starter" | "pro" | "enterprise"
 ) {
   try {
+    const stripe = getStripeClient();
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -221,6 +233,7 @@ export async function updateSubscriptionPlan(
  */
 export async function cancelSubscription(agencyId: string) {
   try {
+    const stripe = getStripeClient();
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -244,7 +257,7 @@ export async function cancelSubscription(agencyId: string) {
     }
 
     // Cancel Stripe subscription
-    await stripe.subscriptions.del(subscription.stripe_subscription_id);
+    await stripe.subscriptions.cancel(subscription.stripe_subscription_id);
 
     // Update DB
     const { error: updateError } = await supabase

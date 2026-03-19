@@ -18,70 +18,66 @@ export default async function DashboardLayout({
   children: ReactNode;
 }) {
   const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
-  try {
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+  if (userError || !user) {
+    redirect("/login");
+  }
 
-    if (userError || !user) {
-      redirect("/login");
-    }
+  // Fetch both user and agency in a single query with join.
+  const { data: dbUser, error: dbUserError } = await supabase
+    .from("users")
+    .select("email, agency_id, agencies(name)")
+    .eq("id", user.id)
+    .maybeSingle();
 
-    // Fetch both user and agency in a single query with join
-    const { data: dbUser, error: dbUserError } = await supabase
-      .from("users")
-      .select("email, agency_id, agencies(name)")
-      .eq("id", user.id)
-      .single();
+  if (dbUserError) {
+    redirect("/login");
+  }
 
-<<<<<<<< HEAD:src/app/(dashboard)/layout.tsx
-    if (dbUserError || !dbUser) {
-      redirect("/login");
-    }
-========
   if (!dbUser) {
     redirect("/setup");
   }
->>>>>>>> e9730c1 (Fix auth flow and app routing):reportly/src/app/(dashboard)/layout.tsx
 
-    const agencyName = (dbUser.agencies as any)?.name ?? "Your agency";
-    const userEmail = dbUser.email ?? user.email ?? "";
+  const agencyName = (dbUser.agencies as { name?: string } | null)?.name ?? "Your agency";
+  const userEmail = dbUser.email ?? user.email ?? "";
 
-    return (
-      <div className="min-h-screen bg-neutral-950 text-neutral-50 flex">
-        <aside className="hidden md:flex w-64 flex-col border-r border-neutral-900 bg-gradient-to-b from-neutral-950 via-neutral-950 to-neutral-950/80">
-          <div className="h-16 flex items-center px-6 border-b border-neutral-900">
-            <div className="flex items-center gap-2">
-              <div className="h-7 w-7 rounded-md bg-neutral-100" />
-              <div className="flex flex-col">
-                <span className="text-sm font-semibold leading-tight truncate">
-                  {agencyName}
-                </span>
-                <span className="text-[11px] text-neutral-400 leading-tight truncate">
-                  {userEmail}
-                </span>
-              </div>
+  return (
+    <div className="min-h-screen bg-neutral-950 text-neutral-50 flex">
+      <aside className="hidden md:flex w-64 flex-col border-r border-neutral-900 bg-gradient-to-b from-neutral-950 via-neutral-950 to-neutral-950/80">
+        <div className="h-16 flex items-center px-6 border-b border-neutral-900">
+          <div className="flex items-center gap-2">
+            <div className="h-7 w-7 rounded-md bg-neutral-100" />
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold leading-tight truncate">
+                {agencyName}
+              </span>
+              <span className="text-[11px] text-neutral-400 leading-tight truncate">
+                {userEmail}
+              </span>
             </div>
           </div>
+        </div>
 
-          <nav className="flex-1 px-3 py-4 space-y-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-neutral-300 hover:text-neutral-50 hover:bg-neutral-900/80 transition-colors"
-              >
-                <span>{item.label}</span>
-              </Link>
-            ))}
-          </nav>
+        <nav className="flex-1 px-3 py-4 space-y-1">
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-neutral-300 hover:text-neutral-50 hover:bg-neutral-900/80 transition-colors"
+            >
+              <span>{item.label}</span>
+            </Link>
+          ))}
+        </nav>
 
-          <div className="px-4 py-4 border-t border-neutral-900 text-xs text-neutral-500">
-            <p className="truncate">Reportly · Client reporting</p>
-          </div>
-        </aside>
+        <div className="px-4 py-4 border-t border-neutral-900 text-xs text-neutral-500">
+          <p className="truncate">Reportly · Client reporting</p>
+        </div>
+      </aside>
 
       <div className="flex-1 flex flex-col">
         <header className="h-14 flex items-center justify-between border-b border-neutral-900 px-4 md:px-6 bg-neutral-950/80 backdrop-blur">

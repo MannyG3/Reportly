@@ -83,7 +83,7 @@ export async function POST(req: Request) {
 
     if (userRowError) {
       // rollback agency + auth user
-      await supabaseAdmin.from("agencies").delete().eq("id", agency.id).catch(() => null);
+      await supabaseAdmin.from("agencies").delete().eq("id", agency.id);
       await supabaseAdmin.auth.admin.deleteUser(userId).catch(() => null);
       return NextResponse.json(
         { error: userRowError.message ?? "Unable to create user profile" },
