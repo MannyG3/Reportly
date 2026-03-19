@@ -2,8 +2,6 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getBrowserSupabaseClient } from "@/lib/supabase/client";
-
 interface LoginFormState {
   email: string;
   password: string;
@@ -12,22 +10,17 @@ interface LoginFormState {
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const supabase = getBrowserSupabaseClient();
 
-  const [form, setForm] = useState<LoginFormState>({
-    email: "",
-    password: "",
-  });
+  const [form, setForm] = useState<LoginFormState>({ email: "", password: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const redirectTo = searchParams.get("redirect") || "/dashboard";
 
-  const handleChange = (field: keyof LoginFormState) => (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setForm((prev) => ({ ...prev, [field]: e.target.value }));
-  };
+  const handleChange =
+    (field: keyof LoginFormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    };
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -41,13 +34,19 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: form.email.trim().toLowerCase(),
-        password: form.password,
+      const email = form.email.trim().toLowerCase();
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password: form.password }),
       });
 
-      if (signInError) {
-        throw signInError;
+      const payload = (await res.json().catch(() => null)) as
+        | { ok: true }
+        | { error: string };
+
+      if (!res.ok) {
+        throw new Error(payload && "error" in payload ? payload.error : "Unable to log in.");
       }
 
       // Wait for session to be established before redirecting
@@ -63,6 +62,7 @@ export default function LoginPage() {
       }
 
       router.push(redirectTo);
+      router.refresh();
     } catch (err) {
       console.error(err);
       setError(
@@ -76,9 +76,7 @@ export default function LoginPage() {
     <main className="min-h-screen bg-neutral-950 text-neutral-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Welcome back
-          </h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Welcome back</h1>
           <p className="text-sm text-neutral-400">
             Log in to access your client reports and dashboard.
           </p>
@@ -89,10 +87,7 @@ export default function LoginPage() {
           className="space-y-6 bg-neutral-900/60 border border-neutral-800 rounded-xl p-6 shadow-lg shadow-black/40"
         >
           <div className="space-y-2">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-neutral-200"
-            >
+            <label htmlFor="email" className="block text-sm font-medium text-neutral-200">
               Email
             </label>
             <input

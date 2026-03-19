@@ -1,75 +1,46 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
-import type { Database, Json } from "@/types";
+import { NextResponse } from "next/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { Json } from "@/types";
 
-type TypedSupabaseClient = any; // Would use proper typing
+interface CreateReportBody {
+  clientId: string;
+  title?: string;
+}
 
-/**
- * POST /api/reports
- * Generate a new report for a client.
- * 
- * Request body:
- * {
- *   clientId: string;
- *   title: string; (optional)
- * }
- */
-export async function POST(req: NextRequest) {
+function monthLabel(d: Date) {
+  return d.toLocaleString("en-US", { month: "short", year: "numeric" });
+}
+
+export async function POST(req: Request) {
+  const supabase = await createSupabaseServerClient();
+
   try {
-    const body = await req.json();
-    const { clientId, title } = body;
-
-    if (!clientId) {
-      return NextResponse.json(
-        { error: "clientId is required" },
-        { status: 400 }
-      );
-    }
-
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      return NextResponse.json(
-        { error: "Supabase not configured" },
-        { status: 500 }
-      );
-    }
-
-    const cookieStore = await cookies();
-    const supabase = createServerClient<Database>(
-      supabaseUrl,
-      supabaseAnonKey,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
-          },
-          set(name: string, value: string, options: any) {
-            cookieStore.set(name, value, options);
-          },
-          remove(name: string, options: any) {
-            cookieStore.set(name, "", { ...options, maxAge: 0 });
-          },
-        },
-      }
-    );
-
-    // Get authenticated user
     const {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get user's agency
+    let body: CreateReportBody;
+    try {
+      body = (await req.json()) as CreateReportBody;
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
+
+    const clientId = (body.clientId ?? "").trim();
+    const titleInput = (body.title ?? "").trim();
+    const title = titleInput.length
+      ? titleInput
+      : `Monthly Report · ${monthLabel(new Date())}`;
+
+    if (!clientId) {
+      return NextResponse.json({ error: "clientId is required" }, { status: 400 });
+    }
+
     const { data: dbUser, error: dbUserError } = await supabase
       .from("users")
       .select("agency_id")
@@ -77,282 +48,115 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (dbUserError || !dbUser) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unable to resolve agency" }, { status: 403 });
     }
 
     const agencyId = dbUser.agency_id;
-
-    // Verify client belongs to this agency
-    const { data: client, error: clientError } = await supabase
-      .from("clients")
-      .select("id, name")
-      .eq("id", clientId)
-      .eq("agency_id", agencyId)
-      .single();
-
-    if (clientError || !client) {
-      return NextResponse.json(
-        { error: "Client not found or does not belong to your agency" },
-        { status: 403 }
-      );
-    }
-
-    // Generate report title if not provided
-    const now = new Date();
-    const reportTitle =
-      title ||
-      `${now.toLocaleString("en-US", { month: "long", year: "numeric" })} Report`;
-
-    // Create report row
     const shareToken = crypto.randomUUID().replaceAll("-", "");
+    const generatedAt = new Date().toISOString();
+
     const { data: report, error: reportError } = await supabase
       .from("reports")
       .insert({
         agency_id: agencyId,
         client_id: clientId,
-        title: reportTitle,
+        title,
         status: "generating",
         share_token: shareToken,
       })
-      .select("id")
+      .select(
+        "id, agency_id, client_id, title, status, share_token, generated_at, created_at"
+      )
       .single();
 
     if (reportError || !report) {
-      return NextResponse.json(
-        { error: "Failed to create report" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Unable to create report" }, { status: 500 });
     }
 
-    // Create mock report sections with placeholder data
-    const sections = await createMockReportSections(supabase, report.id);
-
-    // Mark report as ready
-    const { error: updateError } = await supabase
-      .from("reports")
-      .update({ status: "ready", generated_at: new Date().toISOString() })
-      .eq("id", report.id);
-
-    if (updateError) {
-      console.error("Failed to update report status:", updateError);
-    }
-
-    return NextResponse.json({
-      id: report.id,
-      title: reportTitle,
-      clientName: client.name,
-      shareToken,
-      status: "ready",
-      sections,
-    });
-  } catch (error) {
-    console.error("Report generation error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
-}
-
-/**
- * Create mock report sections with placeholder data.
- * In production, this would fetch real data from GA/Google Ads.
- */
-async function createMockReportSections(
-  supabase: any,
-  reportId: string
-): Promise<any[]> {
-  const mockSections = [
-    {
-      report_id: reportId,
-      section_type: "overview",
-      data_snapshot: {
-        metric: "Total Sessions",
-        value: 12543,
-        change: 15.3,
-        description: "Sessions from all users",
-      } as Json,
-      sort_order: 1,
-    },
-    {
-      report_id: reportId,
-      section_type: "traffic",
-      data_snapshot: {
-        metric: "Page Views",
-        value: 34876,
-        change: 8.2,
-        description: "Total page views across the site",
-        chartData: [
-          { name: "Week 1", value: 8000 },
-          { name: "Week 2", value: 9200 },
-          { name: "Week 3", value: 8500 },
-          { name: "Week 4", value: 9100 },
-        ],
-      } as Json,
-      sort_order: 2,
-    },
-    {
-      report_id: reportId,
-      section_type: "conversions",
-      data_snapshot: {
-        metric: "Conversions",
-        value: 543,
-        change: 22.5,
-        description: "Total conversions in the period",
-        conversionRate: "4.3%",
-      } as Json,
-      sort_order: 3,
-    },
-    {
-      report_id: reportId,
-      section_type: "topPages",
-      data_snapshot: {
-        title: "Top Pages",
-        pages: [
-          { path: "/pricing", views: 3421, value: 12543 },
-          { path: "/features", views: 2876, value: 11234 },
-          { path: "/", views: 2654, value: 9876 },
-          { path: "/about", views: 1543, value: 5432 },
-          { path: "/contact", views: 1234, value: 4567 },
-        ],
-      } as Json,
-      sort_order: 4,
-    },
-    {
-      report_id: reportId,
-      section_type: "deviceBreakdown",
-      data_snapshot: {
-        title: "Device Breakdown",
-        devices: [
-          { name: "Desktop", value: 45, sessions: 5654 },
-          { name: "Mobile", value: 45, sessions: 5654 },
-          { name: "Tablet", value: 10, sessions: 1235 },
-        ],
-      } as Json,
-      sort_order: 5,
-    },
-  ];
-
-  const { data: sections, error } = await supabase
-    .from("report_sections")
-    .insert(mockSections)
-    .select();
-
-  if (error) {
-    console.error("Failed to create report sections:", error);
-    return [];
-  }
-
-  return sections || [];
-}
-
-/**
- * GET /api/reports?reportId=<id>
- * Fetch a single report with sections.
- */
-export async function GET(req: NextRequest) {
-  try {
-    const reportId = req.nextUrl.searchParams.get("reportId");
-
-    if (!reportId) {
-      return NextResponse.json(
-        { error: "reportId is required" },
-        { status: 400 }
-      );
-    }
-
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      return NextResponse.json(
-        { error: "Supabase not configured" },
-        { status: 500 }
-      );
-    }
-
-    const cookieStore = await cookies();
-    const supabase = createServerClient<Database>(
-      supabaseUrl,
-      supabaseAnonKey,
+    const sections: Array<{
+      report_id: string;
+      section_type: string;
+      data_snapshot: Json;
+      sort_order: number;
+    }> = [
       {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
-          },
-          set(name: string, value: string, options: any) {
-            cookieStore.set(name, value, options);
-          },
-          remove(name: string, options: any) {
-            cookieStore.set(name, "", { ...options, maxAge: 0 });
-          },
+        report_id: report.id,
+        section_type: "kpis",
+        sort_order: 1,
+        data_snapshot: {
+          period: monthLabel(new Date()),
+          kpis: [
+            { label: "Sessions", value: 48210, delta: 0.12 },
+            { label: "Users", value: 31790, delta: 0.08 },
+            { label: "Leads", value: 642, delta: 0.19 },
+            { label: "Spend", value: 5230, delta: -0.05 },
+          ],
         },
-      }
-    );
+      },
+      {
+        report_id: report.id,
+        section_type: "traffic_over_time",
+        sort_order: 2,
+        data_snapshot: {
+          series: [
+            { date: "Week 1", sessions: 10500, users: 7200 },
+            { date: "Week 2", sessions: 11800, users: 7900 },
+            { date: "Week 3", sessions: 12450, users: 8200 },
+            { date: "Week 4", sessions: 13460, users: 8490 },
+          ],
+        },
+      },
+      {
+        report_id: report.id,
+        section_type: "channel_mix",
+        sort_order: 3,
+        data_snapshot: {
+          channels: [
+            { name: "Organic", value: 44 },
+            { name: "Paid", value: 28 },
+            { name: "Direct", value: 18 },
+            { name: "Referral", value: 10 },
+          ],
+        },
+      },
+    ];
 
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-
-    if (userError || !user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
-    const { data: dbUser } = await supabase
-      .from("users")
-      .select("agency_id")
-      .eq("id", user.id)
-      .single();
-
-    if (!dbUser) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 401 }
-      );
-    }
-
-    // Fetch report with auth check
-    const { data: report, error: reportError } = await supabase
-      .from("reports")
-      .select("*")
-      .eq("id", reportId)
-      .eq("agency_id", dbUser.agency_id)
-      .single();
-
-    if (reportError || !report) {
-      return NextResponse.json(
-        { error: "Report not found" },
-        { status: 404 }
-      );
-    }
-
-    // Fetch sections
-    const { data: sections, error: sectionsError } = await supabase
+    const { error: sectionsError } = await supabase
       .from("report_sections")
-      .select("*")
-      .eq("report_id", reportId)
-      .order("sort_order", { ascending: true });
+      .insert(sections);
 
     if (sectionsError) {
-      console.error("Failed to fetch sections:", sectionsError);
+      await supabase
+        .from("reports")
+        .update({ status: "failed" })
+        .eq("id", report.id)
+        .eq("agency_id", agencyId);
+
+      return NextResponse.json(
+        { error: "Unable to create report sections" },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({
-      report,
-      sections: sections || [],
-    });
-  } catch (error) {
-    console.error("API error:", error);
+    const { data: finalized, error: finalizeError } = await supabase
+      .from("reports")
+      .update({ status: "ready", generated_at: generatedAt })
+      .eq("id", report.id)
+      .eq("agency_id", agencyId)
+      .select("id, title, status, share_token, generated_at, created_at, client_id")
+      .single();
+
+    if (finalizeError || !finalized) {
+      return NextResponse.json({ error: "Unable to finalize report" }, { status: 500 });
+    }
+
     return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
+      { report: finalized, shareUrl: `/r/${finalized.share_token}` },
+      { status: 201 }
     );
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
   }
 }
+

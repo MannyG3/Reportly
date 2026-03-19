@@ -6,10 +6,6 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
-/**
- * Supabase typed Database definition.
- * Keep in sync with your Supabase schema.
- */
 export interface Database {
   public: {
     Tables: {
@@ -48,29 +44,29 @@ export interface Database {
           id: string;
           agency_id: string;
           email: string;
-          role: 'owner' | 'admin' | 'member';
+          role: "owner" | "admin" | "member";
           created_at: string;
         };
         Insert: {
           id?: string;
           agency_id: string;
           email: string;
-          role?: 'owner' | 'admin' | 'member';
+          role?: "owner" | "admin" | "member";
           created_at?: string;
         };
         Update: {
           id?: string;
           agency_id?: string;
           email?: string;
-          role?: 'owner' | 'admin' | 'member';
+          role?: "owner" | "admin" | "member";
           created_at?: string;
         };
         Relationships: [
           {
-            foreignKeyName: 'users_agency_id_fkey';
-            columns: ['agency_id'];
-            referencedRelation: 'agencies';
-            referencedColumns: ['id'];
+            foreignKeyName: "users_agency_id_fkey";
+            columns: ["agency_id"];
+            referencedRelation: "agencies";
+            referencedColumns: ["id"];
           },
         ];
       };
@@ -80,15 +76,15 @@ export interface Database {
           agency_id: string;
           stripe_customer_id: string;
           stripe_subscription_id: string;
-          plan: 'starter' | 'pro' | 'enterprise';
+          plan: "starter" | "pro" | "enterprise";
           status:
-            | 'incomplete'
-            | 'incomplete_expired'
-            | 'trialing'
-            | 'active'
-            | 'past_due'
-            | 'canceled'
-            | 'unpaid';
+            | "incomplete"
+            | "incomplete_expired"
+            | "trialing"
+            | "active"
+            | "past_due"
+            | "canceled"
+            | "unpaid";
           current_period_end: string | null;
         };
         Insert: {
@@ -96,15 +92,15 @@ export interface Database {
           agency_id: string;
           stripe_customer_id: string;
           stripe_subscription_id: string;
-          plan: 'starter' | 'pro' | 'enterprise';
+          plan: "starter" | "pro" | "enterprise";
           status:
-            | 'incomplete'
-            | 'incomplete_expired'
-            | 'trialing'
-            | 'active'
-            | 'past_due'
-            | 'canceled'
-            | 'unpaid';
+            | "incomplete"
+            | "incomplete_expired"
+            | "trialing"
+            | "active"
+            | "past_due"
+            | "canceled"
+            | "unpaid";
           current_period_end?: string | null;
         };
         Update: {
@@ -112,23 +108,23 @@ export interface Database {
           agency_id?: string;
           stripe_customer_id?: string;
           stripe_subscription_id?: string;
-          plan?: 'starter' | 'pro' | 'enterprise';
+          plan?: "starter" | "pro" | "enterprise";
           status?:
-            | 'incomplete'
-            | 'incomplete_expired'
-            | 'trialing'
-            | 'active'
-            | 'past_due'
-            | 'canceled'
-            | 'unpaid';
+            | "incomplete"
+            | "incomplete_expired"
+            | "trialing"
+            | "active"
+            | "past_due"
+            | "canceled"
+            | "unpaid";
           current_period_end?: string | null;
         };
         Relationships: [
           {
-            foreignKeyName: 'subscriptions_agency_id_fkey';
-            columns: ['agency_id'];
-            referencedRelation: 'agencies';
-            referencedColumns: ['id'];
+            foreignKeyName: "subscriptions_agency_id_fkey";
+            columns: ["agency_id"];
+            referencedRelation: "agencies";
+            referencedColumns: ["id"];
           },
         ];
       };
@@ -159,10 +155,10 @@ export interface Database {
         };
         Relationships: [
           {
-            foreignKeyName: 'clients_agency_id_fkey';
-            columns: ['agency_id'];
-            referencedRelation: 'agencies';
-            referencedColumns: ['id'];
+            foreignKeyName: "clients_agency_id_fkey";
+            columns: ["agency_id"];
+            referencedRelation: "agencies";
+            referencedColumns: ["id"];
           },
         ];
       };
@@ -170,7 +166,7 @@ export interface Database {
         Row: {
           id: string;
           agency_id: string;
-          platform: 'google_analytics' | 'google_ads';
+          platform: "google_analytics" | "google_ads";
           access_token: string;
           refresh_token: string | null;
           token_expires_at: string | null;
@@ -178,7 +174,7 @@ export interface Database {
         Insert: {
           id?: string;
           agency_id: string;
-          platform: 'google_analytics' | 'google_ads';
+          platform: "google_analytics" | "google_ads";
           access_token: string;
           refresh_token?: string | null;
           token_expires_at?: string | null;
@@ -186,17 +182,17 @@ export interface Database {
         Update: {
           id?: string;
           agency_id?: string;
-          platform?: 'google_analytics' | 'google_ads';
+          platform?: "google_analytics" | "google_ads";
           access_token?: string;
           refresh_token?: string | null;
           token_expires_at?: string | null;
         };
         Relationships: [
           {
-            foreignKeyName: 'integrations_agency_id_fkey';
-            columns: ['agency_id'];
-            referencedRelation: 'agencies';
-            referencedColumns: ['id'];
+            foreignKeyName: "integrations_agency_id_fkey";
+            columns: ["agency_id"];
+            referencedRelation: "agencies";
+            referencedColumns: ["id"];
           },
         ];
       };
@@ -206,7 +202,7 @@ export interface Database {
           agency_id: string;
           client_id: string;
           title: string;
-          status: 'draft' | 'generating' | 'ready' | 'failed';
+          status: "draft" | "generating" | "ready" | "failed";
           share_token: string | null;
           generated_at: string | null;
           created_at: string;
@@ -216,7 +212,7 @@ export interface Database {
           agency_id: string;
           client_id: string;
           title: string;
-          status?: 'draft' | 'generating' | 'ready' | 'failed';
+          status?: "draft" | "generating" | "ready" | "failed";
           share_token?: string | null;
           generated_at?: string | null;
           created_at?: string;
@@ -226,23 +222,23 @@ export interface Database {
           agency_id?: string;
           client_id?: string;
           title?: string;
-          status?: 'draft' | 'generating' | 'ready' | 'failed';
+          status?: "draft" | "generating" | "ready" | "failed";
           share_token?: string | null;
           generated_at?: string | null;
           created_at?: string;
         };
         Relationships: [
           {
-            foreignKeyName: 'reports_agency_id_fkey';
-            columns: ['agency_id'];
-            referencedRelation: 'agencies';
-            referencedColumns: ['id'];
+            foreignKeyName: "reports_agency_id_fkey";
+            columns: ["agency_id"];
+            referencedRelation: "agencies";
+            referencedColumns: ["id"];
           },
           {
-            foreignKeyName: 'reports_client_id_fkey';
-            columns: ['client_id'];
-            referencedRelation: 'clients';
-            referencedColumns: ['id'];
+            foreignKeyName: "reports_client_id_fkey";
+            columns: ["client_id"];
+            referencedRelation: "clients";
+            referencedColumns: ["id"];
           },
         ];
       };
@@ -270,10 +266,10 @@ export interface Database {
         };
         Relationships: [
           {
-            foreignKeyName: 'report_sections_report_id_fkey';
-            columns: ['report_id'];
-            referencedRelation: 'reports';
-            referencedColumns: ['id'];
+            foreignKeyName: "report_sections_report_id_fkey";
+            columns: ["report_id"];
+            referencedRelation: "reports";
+            referencedColumns: ["id"];
           },
         ];
       };

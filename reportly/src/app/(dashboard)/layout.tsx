@@ -17,7 +17,7 @@ export default async function DashboardLayout({
 }: {
   children: ReactNode;
 }) {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
 
   try {
     const {
@@ -36,9 +36,15 @@ export default async function DashboardLayout({
       .eq("id", user.id)
       .single();
 
+<<<<<<<< HEAD:src/app/(dashboard)/layout.tsx
     if (dbUserError || !dbUser) {
       redirect("/login");
     }
+========
+  if (!dbUser) {
+    redirect("/setup");
+  }
+>>>>>>>> e9730c1 (Fix auth flow and app routing):reportly/src/app/(dashboard)/layout.tsx
 
     const agencyName = (dbUser.agencies as any)?.name ?? "Your agency";
     const userEmail = dbUser.email ?? user.email ?? "";
@@ -84,9 +90,7 @@ export default async function DashboardLayout({
             <span className="text-sm font-semibold truncate">{agencyName}</span>
           </div>
           <div className="flex-1" />
-          <div className="text-xs text-neutral-400 hidden md:block">
-            {userEmail}
-          </div>
+          <div className="text-xs text-neutral-400 hidden md:block">{userEmail}</div>
         </header>
 
         <main className="flex-1 px-4 md:px-8 py-6 md:py-8 bg-neutral-950">

@@ -1,13 +1,7 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-function StatCard({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | number;
-}) {
+function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="rounded-xl border border-neutral-900 bg-neutral-950/60 p-5 shadow-lg shadow-black/30">
       <div className="text-xs text-neutral-400">{label}</div>
@@ -21,7 +15,7 @@ function StatCard({
 export const revalidate = 60; // ISR: revalidate every 60 seconds
 
 export default async function DashboardHomePage() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
 
   try {
     const {
@@ -53,6 +47,7 @@ export default async function DashboardHomePage() {
       Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1, 0, 0, 0)
     );
 
+<<<<<<<< HEAD:src/app/(dashboard)/dashboard/page.tsx
     // Use Promise.race with timeout
     const timeoutPromise = new Promise((_, reject) =>
       setTimeout(
@@ -62,6 +57,13 @@ export default async function DashboardHomePage() {
     );
 
     const statsPromise = Promise.all([
+========
+    const [
+      { count: totalClients, error: clientsError },
+      { count: totalReports, error: reportsError },
+      { count: reportsThisMonth, error: monthError },
+    ] = await Promise.all([
+>>>>>>>> e9730c1 (Fix auth flow and app routing):reportly/src/app/(dashboard)/dashboard/page.tsx
       supabase
         .from("clients")
         .select("id", { count: "exact", head: true })
@@ -78,6 +80,7 @@ export default async function DashboardHomePage() {
         .gte("generated_at", startOfMonth.toISOString())
         .lt("generated_at", startOfNextMonth.toISOString()),
     ]);
+<<<<<<<< HEAD:src/app/(dashboard)/dashboard/page.tsx
 
     const [
       { count: totalClients, error: clientsError },
@@ -87,6 +90,8 @@ export default async function DashboardHomePage() {
       statsPromise,
       timeoutPromise,
     ])) as typeof [any, any, any];
+========
+>>>>>>>> e9730c1 (Fix auth flow and app routing):reportly/src/app/(dashboard)/dashboard/page.tsx
 
     if (clientsError) throw clientsError;
     if (reportsError) throw reportsError;
@@ -108,13 +113,14 @@ export default async function DashboardHomePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <StatCard label="Total clients" value={totalClients ?? 0} />
           <StatCard label="Total reports generated" value={totalReports ?? 0} />
-          <StatCard label="Reports generated this month" value={reportsThisMonth ?? 0} />
+          <StatCard
+            label="Reports generated this month"
+            value={reportsThisMonth ?? 0}
+          />
         </div>
 
         <div className="rounded-xl border border-neutral-900 bg-neutral-950/60 p-5">
-          <h2 className="text-sm font-medium text-neutral-200">
-            Getting started
-          </h2>
+          <h2 className="text-sm font-medium text-neutral-200">Getting started</h2>
           <p className="mt-2 text-sm text-neutral-400">
             Add your first client, then generate a report. We’ll automate monthly
             branded reporting once integrations are connected.

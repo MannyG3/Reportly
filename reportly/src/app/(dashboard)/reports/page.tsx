@@ -9,17 +9,14 @@ function getString(formData: FormData, key: string) {
   return typeof v === "string" ? v : "";
 }
 
-function pageUrlWithMessage(
-  kind: "success" | "error",
-  message: string
-): string {
+function pageUrlWithMessage(kind: "success" | "error", message: string): string {
   const url = new URL("http://local/reports");
   url.searchParams.set(kind, message);
   return `${url.pathname}?${url.searchParams.toString()}`;
 }
 
 async function getAgencyIdForAuthedUser() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const {
     data: { user },
     error: userError,
@@ -51,7 +48,8 @@ async function generateReportAction(formData: FormData) {
 
   const clientId = getString(formData, "clientId").trim();
   const titleRaw = getString(formData, "title").trim();
-  const title = titleRaw.length ? titleRaw : `Monthly Report · ${monthLabel(new Date())}`;
+  const title =
+    titleRaw.length > 0 ? titleRaw : `Monthly Report · ${monthLabel(new Date())}`;
 
   if (!clientId) {
     redirect(pageUrlWithMessage("error", "Please select a client."));
@@ -183,34 +181,35 @@ export default async function ReportsPage({
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const params = (await searchParams) ?? {};
-  const success =
-    typeof params.success === "string" ? params.success : undefined;
+  const success = typeof params.success === "string" ? params.success : undefined;
   const error = typeof params.error === "string" ? params.error : undefined;
 
   const { supabase, agencyId } = await getAgencyIdForAuthedUser();
 
-  const [{ data: clients, error: clientsError }, { data: reports, error: reportsError }] =
-    await Promise.all([
-      supabase
-        .from("clients")
-        .select("id, name")
-        .eq("agency_id", agencyId)
-        .is("deleted_at", null)
-        .order("created_at", { ascending: false }),
-      supabase
-        .from("reports")
-        .select("id, title, status, share_token, generated_at, created_at, client_id")
-        .eq("agency_id", agencyId)
-        .order("created_at", { ascending: false }),
-    ]);
+  const [
+    { data: clients, error: clientsError },
+    { data: reports, error: reportsError },
+  ] = await Promise.all([
+    supabase
+      .from("clients")
+      .select("id, name")
+      .eq("agency_id", agencyId)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("reports")
+      .select(
+        "id, title, status, share_token, generated_at, created_at, client_id"
+      )
+      .eq("agency_id", agencyId)
+      .order("created_at", { ascending: false }),
+  ]);
 
   if (clientsError || reportsError) {
     console.error(clientsError ?? reportsError);
     return (
       <div className="rounded-xl border border-red-900/60 bg-red-950/30 p-5">
-        <h1 className="text-sm font-medium text-red-200">
-          Unable to load reports
-        </h1>
+        <h1 className="text-sm font-medium text-red-200">Unable to load reports</h1>
         <p className="mt-2 text-sm text-red-300/90">
           Please refresh the page. If the issue persists, check your Supabase RLS
           policies.
@@ -225,9 +224,7 @@ export default async function ReportsPage({
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl md:text-2xl font-semibold tracking-tight">
-            Reports
-          </h1>
+          <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Reports</h1>
           <p className="mt-1 text-sm text-neutral-400">
             Generate and share branded reports with your clients.
           </p>
@@ -249,19 +246,14 @@ export default async function ReportsPage({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-1 rounded-xl border border-neutral-900 bg-neutral-950/60 p-5 shadow-lg shadow-black/30">
-          <h2 className="text-sm font-medium text-neutral-200">
-            Generate report
-          </h2>
+          <h2 className="text-sm font-medium text-neutral-200">Generate report</h2>
           <p className="mt-1 text-sm text-neutral-400">
             Create a new report for a client (mock sections for now).
           </p>
 
           <form action={generateReportAction} className="mt-4 space-y-3">
             <div className="space-y-1.5">
-              <label
-                className="block text-xs text-neutral-400"
-                htmlFor="clientId"
-              >
+              <label className="block text-xs text-neutral-400" htmlFor="clientId">
                 Client
               </label>
               <select
@@ -320,9 +312,7 @@ export default async function ReportsPage({
 
         <div className="lg:col-span-2 rounded-xl border border-neutral-900 bg-neutral-950/60 shadow-lg shadow-black/30 overflow-hidden">
           <div className="px-5 py-4 border-b border-neutral-900 flex items-center justify-between">
-            <h2 className="text-sm font-medium text-neutral-200">
-              Recent reports
-            </h2>
+            <h2 className="text-sm font-medium text-neutral-200">Recent reports</h2>
             <div className="text-xs text-neutral-500">
               {(reports?.length ?? 0).toString()} total
             </div>
@@ -354,7 +344,9 @@ export default async function ReportsPage({
                       </div>
                       <div className="mt-0.5 text-xs text-neutral-500 truncate">
                         {clientName}
-                        {r.generated_at ? ` · Generated ${new Date(r.generated_at).toLocaleDateString()}` : ""}
+                        {r.generated_at
+                          ? ` · Generated ${new Date(r.generated_at).toLocaleDateString()}`
+                          : ""}
                       </div>
                     </div>
 

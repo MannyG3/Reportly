@@ -2,9 +2,12 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+<<<<<<<< HEAD:src/app/(auth)/signup/page.tsx
 import { getBrowserSupabaseClient } from "@/lib/supabase/client";
 import { completeSignup } from "./actions";
 
+========
+>>>>>>>> e9730c1 (Fix auth flow and app routing):reportly/src/app/(auth)/signup/page.tsx
 interface SignupFormState {
   agencyName: string;
   email: string;
@@ -13,7 +16,6 @@ interface SignupFormState {
 
 export default function SignupPage() {
   const router = useRouter();
-  const supabase = getBrowserSupabaseClient();
 
   const [form, setForm] = useState<SignupFormState>({
     agencyName: "",
@@ -23,11 +25,10 @@ export default function SignupPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (field: keyof SignupFormState) => (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setForm((prev) => ({ ...prev, [field]: e.target.value }));
-  };
+  const handleChange =
+    (field: keyof SignupFormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    };
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -41,48 +42,41 @@ export default function SignupPage() {
     setIsSubmitting(true);
 
     try {
-      // 1) Create auth user
-      const {
-        data: { user },
-        error: signUpError,
-      } = await supabase.auth.signUp({
-        email: form.email,
-        password: form.password,
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          agencyName: form.agencyName.trim(),
+          email: form.email.trim().toLowerCase(),
+          password: form.password,
+        }),
       });
 
-      if (signUpError || !user) {
-        throw signUpError ?? new Error("Unable to create user.");
+      const payload = (await res.json().catch(() => null)) as
+        | { ok: true }
+        | { error: string };
+
+      if (!res.ok) {
+        throw new Error(payload && "error" in payload ? payload.error : "Unable to sign up.");
       }
 
-      const agencySlug = form.agencyName
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)+/g, "");
-
-      // 2) Create agency row
-      const { data: agency, error: agencyError } = await supabase
-        .from("agencies")
-        .insert({
-          name: form.agencyName.trim(),
-          slug: agencySlug,
-        })
-        .select("id")
-        .single();
-
-      if (agencyError || !agency) {
-        throw agencyError ?? new Error("Unable to create agency.");
-      }
-
-      // 3) Create user row linked to agency
-      const { error: userError } = await supabase.from("users").insert({
-        id: user.id,
-        agency_id: agency.id,
-        email: form.email.trim().toLowerCase(),
-        role: "owner",
+      const email = form.email.trim().toLowerCase();
+      const loginRes = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password: form.password }),
       });
 
-      if (userError) {
-        throw userError;
+      const loginPayload = (await loginRes.json().catch(() => null)) as
+        | { ok: true }
+        | { error: string };
+
+      if (!loginRes.ok) {
+        throw new Error(
+          loginPayload && "error" in loginPayload
+            ? loginPayload.error
+            : "Account created, but unable to log in."
+        );
       }
 
       // 4) Create Stripe subscription (server-side for security)
@@ -102,7 +96,9 @@ export default function SignupPage() {
     } catch (err) {
       console.error(err);
       setError(
-        err instanceof Error ? err.message : "Something went wrong. Please try again."
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again."
       );
       setIsSubmitting(false);
     }
@@ -143,10 +139,7 @@ export default function SignupPage() {
           </div>
 
           <div className="space-y-2">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-neutral-200"
-            >
+            <label htmlFor="email" className="block text-sm font-medium text-neutral-200">
               Work email
             </label>
             <input

@@ -7,17 +7,14 @@ function getString(formData: FormData, key: string) {
   return typeof v === "string" ? v : "";
 }
 
-function pageUrlWithMessage(
-  kind: "success" | "error",
-  message: string
-): string {
+function pageUrlWithMessage(kind: "success" | "error", message: string): string {
   const url = new URL("http://local/clients");
   url.searchParams.set(kind, message);
   return `${url.pathname}?${url.searchParams.toString()}`;
 }
 
 async function getAgencyIdForAuthedUser() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const {
     data: { user },
     error: userError,
@@ -60,17 +57,13 @@ async function createClientAction(formData: FormData) {
       email,
     });
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
     revalidatePath("/clients");
     redirect(pageUrlWithMessage("success", "Client added."));
   } catch (err) {
     console.error(err);
-    redirect(
-      pageUrlWithMessage("error", "Unable to add client. Please try again.")
-    );
+    redirect(pageUrlWithMessage("error", "Unable to add client. Please try again."));
   }
 }
 
@@ -91,9 +84,7 @@ async function deleteClientAction(formData: FormData) {
       .eq("id", clientId)
       .eq("agency_id", agencyId);
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
     revalidatePath("/clients");
     redirect(pageUrlWithMessage("success", "Client deleted."));
@@ -111,8 +102,7 @@ export default async function ClientsPage({
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const params = (await searchParams) ?? {};
-  const success =
-    typeof params.success === "string" ? params.success : undefined;
+  const success = typeof params.success === "string" ? params.success : undefined;
   const error = typeof params.error === "string" ? params.error : undefined;
 
   const { supabase, agencyId } = await getAgencyIdForAuthedUser();
@@ -127,9 +117,7 @@ export default async function ClientsPage({
   if (clientsError) {
     return (
       <div className="rounded-xl border border-red-900/60 bg-red-950/30 p-5">
-        <h1 className="text-sm font-medium text-red-200">
-          Unable to load clients
-        </h1>
+        <h1 className="text-sm font-medium text-red-200">Unable to load clients</h1>
         <p className="mt-2 text-sm text-red-300/90">
           Please refresh the page. If the issue persists, check your Supabase RLS
           policies.
@@ -142,9 +130,7 @@ export default async function ClientsPage({
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl md:text-2xl font-semibold tracking-tight">
-            Clients
-          </h1>
+          <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Clients</h1>
           <p className="mt-1 text-sm text-neutral-400">
             Manage the clients you generate reports for.
           </p>
@@ -208,9 +194,7 @@ export default async function ClientsPage({
 
         <div className="lg:col-span-2 rounded-xl border border-neutral-900 bg-neutral-950/60 shadow-lg shadow-black/30 overflow-hidden">
           <div className="px-5 py-4 border-b border-neutral-900 flex items-center justify-between">
-            <h2 className="text-sm font-medium text-neutral-200">
-              Your clients
-            </h2>
+            <h2 className="text-sm font-medium text-neutral-200">Your clients</h2>
             <div className="text-xs text-neutral-500">
               {(clients?.length ?? 0).toString()} total
             </div>
