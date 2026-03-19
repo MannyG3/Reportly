@@ -2,7 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import type { Database } from "@/types";
 
-const PROTECTED_PATHS = ["/dashboard", "/clients", "/reports", "/settings"];
+const PROTECTED_PATHS = [
+  "/dashboard",
+  "/app",
+  "/settings",
+  "/clients",
+  "/reports",
+];
 
 function isProtectedPath(pathname: string) {
   return PROTECTED_PATHS.some(
@@ -58,9 +64,10 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: [
     "/dashboard/:path*",
+    "/app/:path*",
+    "/settings/:path*",
     "/clients/:path*",
     "/reports/:path*",
-    "/settings/:path*",
   ],
 };
 
