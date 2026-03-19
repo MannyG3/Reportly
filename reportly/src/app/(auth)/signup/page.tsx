@@ -102,25 +102,25 @@ export default function SignupPage() {
   }
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-md space-y-8">
+    <main className="mac-page-center">
+      <div className="mac-shell-sm space-y-8">
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <h1 className="mac-title">
             Create your agency account
           </h1>
-          <p className="text-sm text-neutral-400">
+          <p className="mac-subtitle">
             Sign up to start generating white-label reports for your clients.
           </p>
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="space-y-6 bg-neutral-900/60 border border-neutral-800 rounded-xl p-6 shadow-lg shadow-black/40"
+          className="space-y-6 mac-card p-6"
         >
           <div className="space-y-2">
             <label
               htmlFor="agencyName"
-              className="block text-sm font-medium text-neutral-200"
+              className="block text-sm font-medium"
             >
               Agency name
             </label>
@@ -130,13 +130,13 @@ export default function SignupPage() {
               autoComplete="organization"
               value={form.agencyName}
               onChange={handleChange("agencyName")}
-              className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm placeholder-neutral-500 outline-none ring-0 focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/40 transition"
+              className="mac-input"
               placeholder="Acme Marketing"
             />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="email" className="block text-sm font-medium text-neutral-200">
+            <label htmlFor="email" className="block text-sm font-medium">
               Work email
             </label>
             <input
@@ -145,7 +145,7 @@ export default function SignupPage() {
               autoComplete="email"
               value={form.email}
               onChange={handleChange("email")}
-              className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm placeholder-neutral-500 outline-none ring-0 focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/40 transition"
+              className="mac-input"
               placeholder="you@agency.com"
             />
           </div>
@@ -153,7 +153,7 @@ export default function SignupPage() {
           <div className="space-y-2">
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-neutral-200"
+              className="block text-sm font-medium"
             >
               Password
             </label>
@@ -163,14 +163,14 @@ export default function SignupPage() {
               autoComplete="new-password"
               value={form.password}
               onChange={handleChange("password")}
-              className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm placeholder-neutral-500 outline-none ring-0 focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/40 transition"
+              className="mac-input"
               placeholder="••••••••"
               minLength={8}
             />
           </div>
 
           {error && (
-            <p className="text-sm text-red-400 bg-red-950/40 border border-red-900/60 rounded-md px-3 py-2">
+            <p className="mac-alert mac-alert-error">
               {error}
             </p>
           )}
@@ -178,17 +178,17 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full inline-flex items-center justify-center rounded-lg bg-neutral-50 text-neutral-950 px-4 py-2.5 text-sm font-medium transition disabled:opacity-60 disabled:cursor-not-allowed hover:bg-white/90"
+            className="mac-btn-primary w-full disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isSubmitting ? "Creating account..." : "Create account"}
           </button>
         </form>
 
-        <p className="text-center text-xs text-neutral-500">
+        <p className="text-center text-xs text-[var(--muted)]">
           Already have an account?{" "}
           <a
             href="/login"
-            className="font-medium text-neutral-200 hover:text-white underline underline-offset-4"
+            className="font-medium text-[var(--white)] hover:text-[var(--gold)] underline underline-offset-4"
           >
             Log in
           </a>

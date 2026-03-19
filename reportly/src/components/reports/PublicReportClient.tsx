@@ -76,9 +76,9 @@ function formatDelta(delta?: number) {
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-neutral-900 bg-neutral-950/60 shadow-lg shadow-black/30 overflow-hidden">
-      <div className="px-5 py-4 border-b border-neutral-900">
-        <h2 className="text-sm font-medium text-neutral-200">{title}</h2>
+    <section className="mac-card overflow-hidden">
+      <div className="px-5 py-4 border-b border-white/10">
+        <h2 className="text-sm font-medium text-[var(--white)]">{title}</h2>
       </div>
       <div className="p-5">{children}</div>
     </section>
@@ -90,7 +90,7 @@ export function PublicReportClientView(props: PublicReportProps) {
 
   return (
     <main
-      className="min-h-screen bg-neutral-950 text-neutral-50"
+      className="min-h-screen text-[var(--white)]"
       style={{ ["--brand" as never]: agency.brandColor }}
     >
       <div className="max-w-5xl mx-auto px-4 py-10 space-y-8">
@@ -105,22 +105,22 @@ export function PublicReportClientView(props: PublicReportProps) {
                   className="h-8 w-8 rounded-md object-cover border border-neutral-800"
                 />
               ) : (
-                <div className="h-8 w-8 rounded-md border border-neutral-800 bg-neutral-100" />
+                <div className="h-8 w-8 rounded-md border border-white/15 bg-white/90" />
               )}
               <div className="min-w-0">
-                <div className="text-xs text-neutral-400 truncate">{agency.name}</div>
-                <h1 className="text-xl md:text-2xl font-semibold tracking-tight truncate">
+                <div className="text-xs text-[var(--muted)] truncate">{agency.name}</div>
+                <h1 className="mac-title truncate">
                   {reportTitle}
                 </h1>
               </div>
             </div>
-            <p className="mt-3 text-sm text-neutral-400">
-              Client: <span className="text-neutral-200">{client.name}</span>
+            <p className="mt-3 text-sm text-[var(--muted)]">
+              Client: <span className="text-[var(--white)]">{client.name}</span>
               {generatedAt ? (
                 <>
                   {" "}
                   · Generated{" "}
-                  <span className="text-neutral-200">
+                  <span className="text-[var(--white)]">
                     {new Date(generatedAt).toLocaleDateString()}
                   </span>
                 </>
@@ -130,7 +130,7 @@ export function PublicReportClientView(props: PublicReportProps) {
 
           <div className="hidden md:flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full bg-[var(--brand)] shadow-[0_0_0_3px_rgba(255,255,255,0.06)]" />
-            <span className="text-xs text-neutral-400">Branded report</span>
+            <span className="text-xs text-[var(--muted)]">Branded report</span>
           </div>
         </header>
 
@@ -152,9 +152,9 @@ export function PublicReportClientView(props: PublicReportProps) {
                         return (
                           <div
                             key={kpi.label}
-                            className="rounded-xl border border-neutral-900 bg-neutral-950/40 p-4"
+                            className="mac-card-subtle p-4"
                           >
-                            <div className="text-xs text-neutral-400">{kpi.label}</div>
+                            <div className="text-xs text-[var(--muted)]">{kpi.label}</div>
                             <div className="mt-2 text-xl font-semibold tracking-tight">
                               {kpi.value.toLocaleString()}
                             </div>
@@ -168,7 +168,7 @@ export function PublicReportClientView(props: PublicReportProps) {
                                 {deltaText} vs previous period
                               </div>
                             ) : (
-                              <div className="mt-1 text-xs text-neutral-500">—</div>
+                              <div className="mt-1 text-xs text-[var(--muted)]">—</div>
                             )}
                           </div>
                         );
@@ -286,18 +286,18 @@ export function PublicReportClientView(props: PublicReportProps) {
                         {data.map((c) => (
                           <div
                             key={c.name}
-                            className="flex items-center justify-between gap-3 rounded-xl border border-neutral-900 bg-neutral-950/40 px-3 py-2"
+                            className="flex items-center justify-between gap-3 mac-card-subtle px-3 py-2"
                           >
                             <div className="flex items-center gap-2 min-w-0">
                               <span
                                 className="h-2.5 w-2.5 rounded-full"
                                 style={{ background: c.fill }}
                               />
-                              <span className="text-sm text-neutral-200 truncate">
+                              <span className="text-sm text-[var(--white)] truncate">
                                 {c.name}
                               </span>
                             </div>
-                            <span className="text-sm font-medium text-neutral-50">
+                            <span className="text-sm font-medium text-[var(--white)]">
                               {c.value}%
                             </span>
                           </div>
@@ -312,7 +312,7 @@ export function PublicReportClientView(props: PublicReportProps) {
             })}
         </div>
 
-        <footer className="pt-4 text-xs text-neutral-600">
+        <footer className="pt-4 text-xs text-[var(--muted)]">
           This report is provided by {agency.name}.
         </footer>
       </div>

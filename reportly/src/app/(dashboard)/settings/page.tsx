@@ -117,10 +117,10 @@ export default async function SettingsPage({
   const currentBrandColor = agency.brand_color?.trim() || "#6366f1";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mac-page">
       <div>
-        <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Settings</h1>
-        <p className="mt-1 text-sm text-neutral-400">
+        <h1 className="mac-title">Settings</h1>
+        <p className="mt-1 text-sm text-[var(--muted)]">
           Manage your agency branding and domain settings.
         </p>
       </div>
@@ -128,10 +128,10 @@ export default async function SettingsPage({
       {(success || error) && (
         <div
           className={[
-            "rounded-xl border px-4 py-3 text-sm",
+            "mac-alert",
             success
-              ? "border-emerald-900/60 bg-emerald-950/25 text-emerald-200"
-              : "border-red-900/60 bg-red-950/25 text-red-200",
+              ? "mac-alert-success"
+              : "mac-alert-error",
           ].join(" ")}
         >
           {success ?? error}
@@ -139,9 +139,9 @@ export default async function SettingsPage({
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 rounded-xl border border-neutral-900 bg-neutral-950/60 p-5 shadow-lg shadow-black/30">
-          <h2 className="text-sm font-medium text-neutral-200">Agency</h2>
-          <p className="mt-1 text-sm text-neutral-400">
+        <div className="lg:col-span-2 mac-card p-5">
+          <h2 className="text-sm font-medium text-[var(--white)]">Agency</h2>
+          <p className="mt-1 text-sm text-[var(--muted)]">
             These settings appear on public reports and shared links.
           </p>
 
@@ -155,7 +155,7 @@ export default async function SettingsPage({
                 name="name"
                 type="text"
                 defaultValue={agency.name}
-                className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm placeholder-neutral-500 outline-none focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/40 transition"
+                className="mac-input"
                 required
               />
             </div>
@@ -170,7 +170,7 @@ export default async function SettingsPage({
                 type="url"
                 defaultValue={agency.logo_url ?? ""}
                 placeholder="https://youragency.com/logo.png"
-                className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm placeholder-neutral-500 outline-none focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/40 transition"
+                className="mac-input"
               />
               <p className="text-xs text-neutral-500">
                 Use a square image for best results (e.g. 256×256).
@@ -188,7 +188,7 @@ export default async function SettingsPage({
                   type="text"
                   defaultValue={agency.brand_color ?? ""}
                   placeholder="#6366f1"
-                  className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm placeholder-neutral-500 outline-none focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/40 transition"
+                  className="mac-input"
                 />
               </div>
               <div className="flex items-center gap-3">
@@ -217,7 +217,7 @@ export default async function SettingsPage({
                 type="text"
                 defaultValue={agency.custom_domain ?? ""}
                 placeholder="reports.youragency.com"
-                className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm placeholder-neutral-500 outline-none focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/40 transition"
+                className="mac-input"
               />
               <p className="text-xs text-neutral-500">
                 You’ll connect DNS later. For now we store the domain.
@@ -230,7 +230,7 @@ export default async function SettingsPage({
               </div>
               <button
                 type="submit"
-                className="inline-flex items-center justify-center rounded-lg bg-neutral-50 text-neutral-950 px-4 py-2.5 text-sm font-medium hover:bg-white/90 transition"
+                className="mac-btn-primary"
               >
                 Save changes
               </button>
@@ -238,9 +238,9 @@ export default async function SettingsPage({
           </form>
         </div>
 
-        <div className="lg:col-span-1 rounded-xl border border-neutral-900 bg-neutral-950/60 p-5 shadow-lg shadow-black/30">
-          <h2 className="text-sm font-medium text-neutral-200">Public sharing</h2>
-          <p className="mt-1 text-sm text-neutral-400">
+        <div className="lg:col-span-1 mac-card p-5">
+          <h2 className="text-sm font-medium text-[var(--white)]">Public sharing</h2>
+          <p className="mt-1 text-sm text-[var(--muted)]">
             Reports are shareable via a secure tokenized link.
           </p>
 

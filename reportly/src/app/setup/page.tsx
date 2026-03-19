@@ -108,11 +108,11 @@ export default async function SetupPage({
   const error = typeof params.error === "string" ? params.error : undefined;
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-md space-y-6">
+    <main className="mac-page-center">
+      <div className="mac-shell-sm space-y-6">
         <div className="space-y-2">
-          <h1 className="text-2xl font-semibold tracking-tight">Finish setup</h1>
-          <p className="text-sm text-neutral-400">
+          <h1 className="mac-title">Finish setup</h1>
+          <p className="mac-subtitle">
             Your account exists, but your agency profile wasn’t created yet. Add your
             agency name to continue.
           </p>
@@ -120,12 +120,12 @@ export default async function SetupPage({
 
         <form
           action={provisionAction}
-          className="space-y-4 bg-neutral-900/60 border border-neutral-800 rounded-xl p-6 shadow-lg shadow-black/40"
+          className="space-y-4 mac-card p-6"
         >
           <div className="space-y-2">
             <label
               htmlFor="agencyName"
-              className="block text-sm font-medium text-neutral-200"
+              className="block text-sm font-medium"
             >
               Agency name
             </label>
@@ -134,21 +134,21 @@ export default async function SetupPage({
               name="agencyName"
               type="text"
               autoComplete="organization"
-              className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm placeholder-neutral-500 outline-none ring-0 focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/40 transition"
+              className="mac-input"
               placeholder="Acme Marketing"
               required
             />
           </div>
 
           {error && (
-            <p className="text-sm text-red-400 bg-red-950/40 border border-red-900/60 rounded-md px-3 py-2">
+            <p className="mac-alert mac-alert-error">
               {error}
             </p>
           )}
 
           <button
             type="submit"
-            className="w-full inline-flex items-center justify-center rounded-lg bg-neutral-50 text-neutral-950 px-4 py-2.5 text-sm font-medium transition hover:bg-white/90"
+            className="mac-btn-primary w-full"
           >
             Continue
           </button>

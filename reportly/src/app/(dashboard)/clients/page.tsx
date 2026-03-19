@@ -116,7 +116,7 @@ export default async function ClientsPage({
 
   if (clientsError) {
     return (
-      <div className="rounded-xl border border-red-900/60 bg-red-950/30 p-5">
+      <div className="mac-page mac-alert mac-alert-error">
         <h1 className="text-sm font-medium text-red-200">Unable to load clients</h1>
         <p className="mt-2 text-sm text-red-300/90">
           Please refresh the page. If the issue persists, check your Supabase RLS
@@ -127,11 +127,11 @@ export default async function ClientsPage({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mac-page">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Clients</h1>
-          <p className="mt-1 text-sm text-neutral-400">
+          <h1 className="mac-title">Clients</h1>
+          <p className="mt-1 text-sm text-[var(--muted)]">
             Manage the clients you generate reports for.
           </p>
         </div>
@@ -140,10 +140,10 @@ export default async function ClientsPage({
       {(success || error) && (
         <div
           className={[
-            "rounded-xl border px-4 py-3 text-sm",
+            "mac-alert",
             success
-              ? "border-emerald-900/60 bg-emerald-950/25 text-emerald-200"
-              : "border-red-900/60 bg-red-950/25 text-red-200",
+              ? "mac-alert-success"
+              : "mac-alert-error",
           ].join(" ")}
         >
           {success ?? error}
@@ -151,9 +151,9 @@ export default async function ClientsPage({
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-1 rounded-xl border border-neutral-900 bg-neutral-950/60 p-5 shadow-lg shadow-black/30">
-          <h2 className="text-sm font-medium text-neutral-200">Add client</h2>
-          <p className="mt-1 text-sm text-neutral-400">
+        <div className="lg:col-span-1 mac-card p-5">
+          <h2 className="text-sm font-medium text-[var(--white)]">Add client</h2>
+          <p className="mt-1 text-sm text-[var(--muted)]">
             Add a client to start generating reports.
           </p>
 
@@ -167,7 +167,7 @@ export default async function ClientsPage({
                 name="name"
                 type="text"
                 placeholder="Acme Co."
-                className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm placeholder-neutral-500 outline-none focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/40 transition"
+                className="mac-input"
                 required
               />
             </div>
@@ -180,27 +180,27 @@ export default async function ClientsPage({
                 name="email"
                 type="email"
                 placeholder="client@acme.com"
-                className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm placeholder-neutral-500 outline-none focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/40 transition"
+                className="mac-input"
               />
             </div>
             <button
               type="submit"
-              className="w-full inline-flex items-center justify-center rounded-lg bg-neutral-50 text-neutral-950 px-4 py-2.5 text-sm font-medium hover:bg-white/90 transition"
+              className="mac-btn-primary w-full"
             >
               Add client
             </button>
           </form>
         </div>
 
-        <div className="lg:col-span-2 rounded-xl border border-neutral-900 bg-neutral-950/60 shadow-lg shadow-black/30 overflow-hidden">
-          <div className="px-5 py-4 border-b border-neutral-900 flex items-center justify-between">
-            <h2 className="text-sm font-medium text-neutral-200">Your clients</h2>
-            <div className="text-xs text-neutral-500">
+        <div className="lg:col-span-2 mac-card overflow-hidden">
+          <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
+            <h2 className="text-sm font-medium text-[var(--white)]">Your clients</h2>
+            <div className="text-xs text-[var(--muted)]">
               {(clients?.length ?? 0).toString()} total
             </div>
           </div>
 
-          <div className="divide-y divide-neutral-900">
+          <div className="divide-y divide-white/10">
             {(clients ?? []).length === 0 ? (
               <div className="px-5 py-10 text-center">
                 <p className="text-sm text-neutral-300">No clients yet.</p>
@@ -227,7 +227,7 @@ export default async function ClientsPage({
                     <input type="hidden" name="clientId" value={client.id} />
                     <button
                       type="submit"
-                      className="inline-flex items-center justify-center rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-2 text-xs font-medium text-neutral-200 hover:bg-neutral-900/70 transition"
+                      className="mac-btn-secondary text-xs px-3 py-2"
                     >
                       Delete
                     </button>

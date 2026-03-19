@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useRef } from "react"
+import { useEffect } from "react"
 
 export default function LandingClient() {
   useEffect(() => {
@@ -10,36 +10,19 @@ export default function LandingClient() {
     )
     document.querySelectorAll('.reveal').forEach(el => obs.observe(el))
 
-    // Custom cursor
-    const cursor = document.getElementById('mac-cursor')
-    const cursorDot = document.getElementById('mac-cursor-dot')
-    let mx = 0, my = 0, cx = 0, cy = 0
-    const moveCursor = (e: MouseEvent) => { mx = e.clientX; my = e.clientY }
-    window.addEventListener('mousemove', moveCursor)
-    const animCursor = () => {
-      cx += (mx - cx) * 0.12
-      cy += (my - cy) * 0.12
-      if (cursor) { cursor.style.transform = `translate(${cx - 20}px, ${cy - 20}px)` }
-      if (cursorDot) { cursorDot.style.transform = `translate(${mx - 3}px, ${my - 3}px)` }
-      requestAnimationFrame(animCursor)
-    }
-    animCursor()
-
-    // Cursor scale on hover
-    document.querySelectorAll('a, button, .fc, .si, .plan').forEach(el => {
-      el.addEventListener('mouseenter', () => cursor?.classList.add('hovered'))
-      el.addEventListener('mouseleave', () => cursor?.classList.remove('hovered'))
-    })
-
     // Navbar scroll
     const nav = document.getElementById('main-nav')
-    window.addEventListener('scroll', () => {
+    const handleScroll = () => {
       if (nav) nav.style.background = window.scrollY > 20
         ? 'rgba(10,10,10,0.92)'
         : 'rgba(10,10,10,0.75)'
-    })
+    }
+    window.addEventListener('scroll', handleScroll)
 
-    return () => window.removeEventListener('mousemove', moveCursor)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      obs.disconnect()
+    }
   }, [])
 
   return (
@@ -59,39 +42,17 @@ export default function LandingClient() {
         }
 
         /* ---- BASE ---- */
-        html{scroll-behavior:smooth;cursor:none}
+        html{scroll-behavior:smooth}
         body{
           font-family:var(--sf);
           background:var(--black);color:var(--white);font-size:16px;line-height:1.6;
           overflow-x:hidden;-webkit-font-smoothing:antialiased;
-          -moz-osx-font-smoothing:grayscale;cursor:none;
+          -moz-osx-font-smoothing:grayscale;
         }
-        a,button{cursor:none}
         body::before{
           content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
           background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
           opacity:0.032
-        }
-
-        /* ---- CUSTOM CURSOR ---- */
-        #mac-cursor{
-          position:fixed;top:0;left:0;width:40px;height:40px;
-          border:1.5px solid rgba(255,255,255,0.5);border-radius:50%;
-          pointer-events:none;z-index:9999;
-          transition:width .2s cubic-bezier(0.34,1.56,0.64,1),
-                      height .2s cubic-bezier(0.34,1.56,0.64,1),
-                      border-color .2s,background .2s;
-          will-change:transform;
-        }
-        #mac-cursor.hovered{
-          width:56px;height:56px;
-          background:rgba(201,168,76,0.08);
-          border-color:rgba(201,168,76,0.6);
-        }
-        #mac-cursor-dot{
-          position:fixed;top:0;left:0;width:6px;height:6px;
-          background:var(--white);border-radius:50%;
-          pointer-events:none;z-index:10000;will-change:transform;
         }
 
         /* ---- NAV ---- */
@@ -464,8 +425,6 @@ export default function LandingClient() {
         /* ---- RESPONSIVE ---- */
         @media(max-width:768px){
           nav{padding:0 1.25rem}.nav-mid{display:none}
-          #mac-cursor,#mac-cursor-dot{display:none}
-          html,body{cursor:auto}a,button{cursor:pointer}
           .hero-h1{font-size:2.75rem}.proof{gap:1.25rem;flex-wrap:wrap}
           .mrow{grid-template-columns:1fr 1fr}.crow{grid-template-columns:1fr}
           .sgrid,.fgrid,.pgrid{grid-template-columns:1fr}
@@ -474,10 +433,6 @@ export default function LandingClient() {
           footer{flex-direction:column;gap:1rem;text-align:center}
         }
       `}</style>
-
-      {/* Custom cursor */}
-      <div id="mac-cursor"></div>
-      <div id="mac-cursor-dot"></div>
 
       {/* Nav */}
       <nav id="main-nav">

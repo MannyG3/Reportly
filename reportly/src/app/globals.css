@@ -1,8 +1,28 @@
 @import "tailwindcss";
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --black: #0a0a0a;
+  --off-black: #111110;
+  --dark: #1c1c1a;
+  --mid: #3a3a38;
+  --muted: #6b6b68;
+  --subtle: #a8a8a4;
+  --line: rgba(255, 255, 255, 0.08);
+  --white: #ffffff;
+  --off-white: #f8f7f4;
+  --cream: #f2f0eb;
+  --gold: #c9a84c;
+  --gold-dim: rgba(201, 168, 76, 0.15);
+  --sf: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  --serif: 'Instrument Serif', Georgia, serif;
+  --background: #0a0a0a;
+  --foreground: #ffffff;
 }
 
 @theme inline {
@@ -15,12 +35,277 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: #ffffff;
   }
 }
 
+html {
+  scroll-behavior: smooth;
+  cursor: none;
+  -webkit-overflow-scrolling: touch;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--sf);
+  font-size: 16px;
+  line-height: 1.6;
+  cursor: none;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  cursor: none;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.028;
+}
+
+.mac-site-shell {
+  position: relative;
+  z-index: 1;
+}
+
+#global-mac-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transition: width 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    height 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s,
+    background 0.2s;
+  will-change: transform;
+}
+
+#global-mac-cursor.hovered {
+  width: 56px;
+  height: 56px;
+  background: rgba(201, 168, 76, 0.08);
+  border-color: rgba(201, 168, 76, 0.6);
+}
+
+#global-mac-cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  background: var(--white);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  will-change: transform;
+}
+
+.mac-page {
+  padding: 0.25rem 0;
+}
+
+.mac-page-center {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.mac-shell {
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.mac-shell-sm {
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+.mac-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(18px) saturate(170%);
+  -webkit-backdrop-filter: blur(18px) saturate(170%);
+}
+
+.mac-card-subtle {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+}
+
+.mac-title {
+  font-family: var(--serif);
+  font-size: clamp(1.5rem, 2.5vw, 2.1rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.mac-subtitle {
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+}
+
+.mac-input,
+.mac-select {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 0.72rem 0.92rem;
+  font-size: 0.88rem;
+  color: var(--white);
+  font-family: var(--sf);
+  transition: all 0.15s ease;
+}
+
+.mac-input::placeholder {
+  color: var(--muted);
+}
+
+.mac-input:focus,
+.mac-select:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(201, 168, 76, 0.5);
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.1);
+}
+
+.mac-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 10px;
+  padding: 0.75rem 1.2rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--black);
+  background: var(--gold);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mac-btn-primary:hover {
+  background: #d4b55e;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(201, 168, 76, 0.28);
+}
+
+.mac-btn-primary:active {
+  transform: scale(0.98);
+}
+
+.mac-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  padding: 0.75rem 1.2rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--subtle);
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.15s ease;
+}
+
+.mac-btn-secondary:hover {
+  color: var(--white);
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.mac-btn-secondary:active {
+  transform: scale(0.98);
+}
+
+.mac-alert {
+  border-radius: 12px;
+  border: 1px solid;
+  padding: 0.72rem 0.9rem;
+  font-size: 0.83rem;
+}
+
+.mac-alert-error {
+  color: #ffb3b3;
+  background: rgba(255, 107, 107, 0.1);
+  border-color: rgba(255, 107, 107, 0.28);
+}
+
+.mac-alert-success {
+  color: #b7ffd9;
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.32);
+}
+
+/* Utility classes for common patterns */
+.spring-hover {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+}
+
+.spring-hover:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.spring-hover:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.smooth-fade {
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.glass-effect {
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  background: rgba(10, 10, 10, 0.75);
+}
+
+@media (max-width: 768px) {
+  #global-mac-cursor,
+  #global-mac-cursor-dot {
+    display: none;
+  }
+
+  html,
+  body {
+    cursor: auto;
+  }
+
+  a,
+  button,
+  input,
+  select,
+  textarea {
+    cursor: pointer;
+  }
+
+  .mac-page {
+    padding: 1.25rem 0.85rem;
+  }
 }
