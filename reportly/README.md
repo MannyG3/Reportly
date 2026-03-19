@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Reportly App
 
-## Getting Started
+This is the deployable Next.js application for Reportly.
 
-First, run the development server:
+## Features
+
+- Public landing page at `/`
+- Authentication pages at `/login` and `/signup`
+- Protected app routes such as `/dashboard`, `/clients`, `/reports`, `/settings`
+- Report sharing endpoint at `/r/[token]`
+- Supabase-backed auth/data layer
+- Stripe webhook endpoint at `/api/webhooks`
+
+## Local development
+
+1. Install dependencies.
+
+```bash
+npm install
+```
+
+2. Create `.env.local` in this folder with:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://<your-project-ref>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
+SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
+```
+
+Optional for billing:
+
+```bash
+STRIPE_SECRET_KEY=sk_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_PRICE_ID_STARTER=price_...
+STRIPE_PRICE_ID_PRO=price_...
+STRIPE_PRICE_ID_ENTERPRISE=price_...
+```
+
+3. Start dev server.
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run dev`: Start local dev server
+- `npm run build`: Create production build
+- `npm run start`: Run production server locally
+- `npm run lint`: Run lint checks
 
-## Learn More
+## Auth behavior
 
-To learn more about Next.js, take a look at the following resources:
+- `/` is public and renders landing content
+- Middleware protects only app routes
+- Unauthenticated users are redirected to `/login` for protected pages
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Deploy from this folder:
 
-## Deploy on Vercel
+```bash
+npx vercel --prod
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+If environment variables are changed in Vercel, redeploy to apply them.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## More setup details
+
+For full Supabase table/RLS setup, see [../SETUP.md](../SETUP.md).
