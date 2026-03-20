@@ -1,17 +1,6 @@
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import ClientsView from "@/components/clients/ClientsView";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-
-function getString(formData: FormData, key: string) {
-  const v = formData.get(key);
-  return typeof v === "string" ? v : "";
-}
-
-function pageUrlWithMessage(kind: "success" | "error", message: string): string {
-  const url = new URL("http://local/clients");
-  url.searchParams.set(kind, message);
-  return `${url.pathname}?${url.searchParams.toString()}`;
-}
 
 async function getAgencyIdForAuthedUser() {
   const supabase = await createSupabaseServerClient();
@@ -36,75 +25,7 @@ async function getAgencyIdForAuthedUser() {
 
   return { supabase, agencyId: dbUser.agency_id };
 }
-
-async function createClientAction(formData: FormData) {
-  "use server";
-
-  const name = getString(formData, "name").trim();
-  const emailRaw = getString(formData, "email").trim();
-  const email = emailRaw.length ? emailRaw.toLowerCase() : null;
-
-  if (!name) {
-    redirect(pageUrlWithMessage("error", "Client name is required."));
-  }
-
-  try {
-    const { supabase, agencyId } = await getAgencyIdForAuthedUser();
-
-    const { error } = await supabase.from("clients").insert({
-      agency_id: agencyId,
-      name,
-      email,
-    });
-
-    if (error) throw error;
-
-    revalidatePath("/clients");
-    redirect(pageUrlWithMessage("success", "Client added."));
-  } catch (err) {
-    console.error(err);
-    redirect(pageUrlWithMessage("error", "Unable to add client. Please try again."));
-  }
-}
-
-async function deleteClientAction(formData: FormData) {
-  "use server";
-
-  const clientId = getString(formData, "clientId").trim();
-  if (!clientId) {
-    redirect(pageUrlWithMessage("error", "Invalid client."));
-  }
-
-  try {
-    const { supabase, agencyId } = await getAgencyIdForAuthedUser();
-
-    const { error } = await supabase
-      .from("clients")
-      .update({ deleted_at: new Date().toISOString() })
-      .eq("id", clientId)
-      .eq("agency_id", agencyId);
-
-    if (error) throw error;
-
-    revalidatePath("/clients");
-    redirect(pageUrlWithMessage("success", "Client deleted."));
-  } catch (err) {
-    console.error(err);
-    redirect(
-      pageUrlWithMessage("error", "Unable to delete client. Please try again.")
-    );
-  }
-}
-
-export default async function ClientsPage({
-  searchParams,
-}: {
-  searchParams?: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  const params = (await searchParams) ?? {};
-  const success = typeof params.success === "string" ? params.success : undefined;
-  const error = typeof params.error === "string" ? params.error : undefined;
-
+export default async function ClientsPage() {
   const { supabase, agencyId } = await getAgencyIdForAuthedUser();
 
   const { data: clients, error: clientsError } = await supabase
@@ -126,119 +47,6 @@ export default async function ClientsPage({
     );
   }
 
-  return (
-    <div className="space-y-6 mac-page">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="mac-title">Clients</h1>
-          <p className="mt-1 text-sm text-[var(--muted)]">
-            Manage the clients you generate reports for.
-          </p>
-        </div>
-      </div>
-
-      {(success || error) && (
-        <div
-          className={[
-            "mac-alert",
-            success
-              ? "mac-alert-success"
-              : "mac-alert-error",
-          ].join(" ")}
-        >
-          {success ?? error}
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-1 mac-card p-5">
-          <h2 className="text-sm font-medium text-[var(--white)]">Add client</h2>
-          <p className="mt-1 text-sm text-[var(--muted)]">
-            Add a client to start generating reports.
-          </p>
-
-          <form action={createClientAction} className="mt-4 space-y-3">
-            <div className="space-y-1.5">
-              <label className="block text-xs text-neutral-400" htmlFor="name">
-                Client name
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                placeholder="Acme Co."
-                className="mac-input"
-                required
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="block text-xs text-neutral-400" htmlFor="email">
-                Client email (optional)
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="client@acme.com"
-                className="mac-input"
-              />
-            </div>
-            <button
-              type="submit"
-              className="mac-btn-primary w-full"
-            >
-              Add client
-            </button>
-          </form>
-        </div>
-
-        <div className="lg:col-span-2 mac-card overflow-hidden">
-          <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
-            <h2 className="text-sm font-medium text-[var(--white)]">Your clients</h2>
-            <div className="text-xs text-[var(--muted)]">
-              {(clients?.length ?? 0).toString()} total
-            </div>
-          </div>
-
-          <div className="divide-y divide-white/10">
-            {(clients ?? []).length === 0 ? (
-              <div className="px-5 py-10 text-center">
-                <p className="text-sm text-neutral-300">No clients yet.</p>
-                <p className="mt-1 text-sm text-neutral-500">
-                  Add your first client to generate a report.
-                </p>
-              </div>
-            ) : (
-              (clients ?? []).map((client) => (
-                <div
-                  key={client.id}
-                  className="px-5 py-4 flex items-center justify-between gap-4"
-                >
-                  <div className="min-w-0">
-                    <div className="text-sm font-medium text-neutral-100 truncate">
-                      {client.name}
-                    </div>
-                    <div className="mt-0.5 text-xs text-neutral-500 truncate">
-                      {client.email ?? "No email"}
-                    </div>
-                  </div>
-
-                  <form action={deleteClientAction}>
-                    <input type="hidden" name="clientId" value={client.id} />
-                    <button
-                      type="submit"
-                      className="mac-btn-secondary text-xs px-3 py-2"
-                    >
-                      Delete
-                    </button>
-                  </form>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <ClientsView initialClients={clients ?? []} />;
 }
 
