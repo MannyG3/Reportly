@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import type { Client } from "@/components/clients/ClientsView";
+
+type Client = {
+  id: string;
+  name: string;
+  email: string | null;
+  created_at: string;
+};
 
 type ClientCardProps = {
   client: Client;
