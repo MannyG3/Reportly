@@ -1,9 +1,13 @@
 "use client";
 
-import { FormEvent, useState, useEffect } from "react";
+import { FormEvent, useState, useEffect, Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getBrowserSupabaseClient } from "@/lib/supabase/client";
+import { useSearchParams } from "next/navigation";
+import IntegrationsTab from "@/components/settings/IntegrationsTab";
+
+type TabType = "branding" | "integrations" | "team";
 
 interface SettingsFormState {
   agencyName: string;
@@ -12,9 +16,11 @@ interface SettingsFormState {
   customDomain: string;
 }
 
-export default function SettingsPage() {
+function SettingsContent() {
   const supabase = getBrowserSupabaseClient();
+  const searchParams = useSearchParams();
   const [agencyId, setAgencyId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<TabType>("branding");
   const [form, setForm] = useState<SettingsFormState>({
     agencyName: "",
     logoUrl: "",
@@ -25,6 +31,28 @@ export default function SettingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Set active tab from search params
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "integrations" || tab === "team") {
+      setActiveTab(tab as TabType);
+    } else {
+      setActiveTab("branding");
+    }
+
+    const connected = searchParams.get("connected");
+    if (connected) {
+      setSuccess(`Successfully connected ${connected}!`);
+      setTimeout(() => setSuccess(null), 3000);
+    }
+
+    const errorParam = searchParams.get("error");
+    if (errorParam) {
+      setError(`Connection failed: ${errorParam}`);
+      setTimeout(() => setError(null), 5000);
+    }
+  }, [searchParams]);
 
   // Fetch agency data on mount
   useEffect(() => {
@@ -136,7 +164,7 @@ export default function SettingsPage() {
         <div className="space-y-2">
           <h1 className="text-2xl font-semibold text-neutral-50">Settings</h1>
           <p className="text-sm text-neutral-400">
-            Loading your agency settings...
+            Loading your settings...
           </p>
         </div>
       </div>
@@ -148,124 +176,159 @@ export default function SettingsPage() {
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold text-neutral-50">Settings</h1>
         <p className="text-sm text-neutral-400">
-          Manage your agency branding and settings.
+          Manage your agency settings and integrations.
         </p>
       </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-8 max-w-2xl"
-      >
+      {/* Tabs */}
+      <div className="flex gap-2 border-b border-neutral-800">
+        {["branding", "integrations", "team"].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab as TabType)}
+            className={`px-4 py-3 text-sm font-medium transition border-b-2 ${
+              activeTab === tab
+                ? "border-neutral-50 text-neutral-50"
+                : "border-transparent text-neutral-400 hover:text-neutral-50"
+            }`}
+          >
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab Content */}
+      <div>
         {error && (
-          <div className="p-3 rounded-lg bg-red-950/40 border border-red-900/60 text-sm text-red-400">
+          <div className="p-3 mb-6 rounded-lg bg-red-950/40 border border-red-900/60 text-sm text-red-400">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="p-3 rounded-lg bg-green-950/40 border border-green-900/60 text-sm text-green-400">
+          <div className="p-3 mb-6 rounded-lg bg-green-950/40 border border-green-900/60 text-sm text-green-400">
             {success}
           </div>
         )}
 
-        {/* Agency Name */}
-        <div className="space-y-3">
-          <label
-            htmlFor="agencyName"
-            className="block text-sm font-medium text-neutral-200"
-          >
-            Agency name
-          </label>
-          <input
-            id="agencyName"
-            type="text"
-            value={form.agencyName}
-            onChange={handleChange("agencyName")}
-            className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm text-neutral-50 placeholder-neutral-500 outline-none ring-0 focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/40 transition"
-            placeholder="Your Agency Name"
-          />
-        </div>
+        {activeTab === "branding" && agencyId && (
+          <form onSubmit={handleSubmit} className="space-y-8 max-w-2xl">
+            {/* Agency Name */}
+            <div className="space-y-3">
+              <label
+                htmlFor="agencyName"
+                className="block text-sm font-medium text-neutral-200"
+              >
+                Agency name
+              </label>
+              <input
+                id="agencyName"
+                type="text"
+                value={form.agencyName}
+                onChange={handleChange("agencyName")}
+                className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm text-neutral-50 placeholder-neutral-500 outline-none ring-0 focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/40 transition"
+                placeholder="Your Agency Name"
+              />
+            </div>
 
-        {/* Logo URL */}
-        <div className="space-y-3">
-          <label
-            htmlFor="logoUrl"
-            className="block text-sm font-medium text-neutral-200"
-          >
-            Logo URL
-          </label>
-          <input
-            id="logoUrl"
-            type="url"
-            value={form.logoUrl}
-            onChange={handleChange("logoUrl")}
-            className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm text-neutral-50 placeholder-neutral-500 outline-none ring-0 focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/40 transition"
-            placeholder="https://example.com/logo.png"
-          />
-          <p className="text-xs text-neutral-500">
-            Full URL to your agency's logo image.
-          </p>
-        </div>
+            {/* Logo URL */}
+            <div className="space-y-3">
+              <label
+                htmlFor="logoUrl"
+                className="block text-sm font-medium text-neutral-200"
+              >
+                Logo URL
+              </label>
+              <input
+                id="logoUrl"
+                type="url"
+                value={form.logoUrl}
+                onChange={handleChange("logoUrl")}
+                className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm text-neutral-50 placeholder-neutral-500 outline-none ring-0 focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/40 transition"
+                placeholder="https://example.com/logo.png"
+              />
+              <p className="text-xs text-neutral-500">
+                Full URL to your agency's logo image.
+              </p>
+            </div>
 
-        {/* Brand Color */}
-        <div className="space-y-3">
-          <label
-            htmlFor="brandColor"
-            className="block text-sm font-medium text-neutral-200"
-          >
-            Brand color
-          </label>
-          <div className="flex items-center gap-3">
-            <input
-              id="brandColor"
-              type="color"
-              value={form.brandColor}
-              onChange={handleChange("brandColor")}
-              className="h-10 w-20 rounded-lg border border-neutral-800 cursor-pointer"
-            />
-            <input
-              type="text"
-              value={form.brandColor}
-              onChange={handleChange("brandColor")}
-              className="flex-1 rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm text-neutral-50 placeholder-neutral-500 outline-none ring-0 focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/40 transition"
-              placeholder="#ffffff"
-            />
-          </div>
-          <p className="text-xs text-neutral-500">
-            Primary color for report styling.
-          </p>
-        </div>
+            {/* Brand Color */}
+            <div className="space-y-3">
+              <label
+                htmlFor="brandColor"
+                className="block text-sm font-medium text-neutral-200"
+              >
+                Brand color
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  id="brandColor"
+                  type="color"
+                  value={form.brandColor}
+                  onChange={handleChange("brandColor")}
+                  className="h-10 w-20 rounded-lg border border-neutral-800 cursor-pointer"
+                />
+                <input
+                  type="text"
+                  value={form.brandColor}
+                  onChange={handleChange("brandColor")}
+                  className="flex-1 rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm text-neutral-50 placeholder-neutral-500 outline-none ring-0 focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/40 transition"
+                  placeholder="#ffffff"
+                />
+              </div>
+              <p className="text-xs text-neutral-500">
+                Primary color for report styling.
+              </p>
+            </div>
 
-        {/* Custom Domain */}
-        <div className="space-y-3">
-          <label
-            htmlFor="customDomain"
-            className="block text-sm font-medium text-neutral-200"
-          >
-            Custom domain (optional)
-          </label>
-          <input
-            id="customDomain"
-            type="text"
-            value={form.customDomain}
-            onChange={handleChange("customDomain")}
-            className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm text-neutral-50 placeholder-neutral-500 outline-none ring-0 focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/40 transition"
-            placeholder="reports.youragency.com"
-          />
-          <p className="text-xs text-neutral-500">
-            Custom domain for client report URLs. Leave blank to use default.
-          </p>
-        </div>
+            {/* Custom Domain */}
+            <div className="space-y-3">
+              <label
+                htmlFor="customDomain"
+                className="block text-sm font-medium text-neutral-200"
+              >
+                Custom domain (optional)
+              </label>
+              <input
+                id="customDomain"
+                type="text"
+                value={form.customDomain}
+                onChange={handleChange("customDomain")}
+                className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm text-neutral-50 placeholder-neutral-500 outline-none ring-0 focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/40 transition"
+                placeholder="reports.youragency.com"
+              />
+              <p className="text-xs text-neutral-500">
+                Custom domain for client report URLs. Leave blank to use default.
+              </p>
+            </div>
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="inline-flex items-center justify-center rounded-lg bg-neutral-50 text-neutral-950 px-5 py-2.5 text-sm font-medium transition disabled:opacity-60 disabled:cursor-not-allowed hover:bg-white/90"
-        >
-          {isSubmitting ? "Saving..." : "Save settings"}
-        </button>
-      </form>
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="inline-flex items-center justify-center rounded-lg bg-neutral-50 text-neutral-950 px-5 py-2.5 text-sm font-medium transition disabled:opacity-60 disabled:cursor-not-allowed hover:bg-white/90"
+            >
+              {isSubmitting ? "Saving..." : "Save settings"}
+            </button>
+          </form>
+        )}
+
+        {activeTab === "integrations" && agencyId && (
+          <IntegrationsTab agencyId={agencyId} />
+        )}
+
+        {activeTab === "team" && (
+          <div className="text-neutral-400">Team management coming soon.</div>
+        )}
+      </div>
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SettingsContent />
+    </Suspense>
   );
 }
