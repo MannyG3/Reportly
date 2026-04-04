@@ -4,6 +4,7 @@ export async function GET(request: NextRequest) {
   try {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const redirectUri = process.env.GOOGLE_REDIRECT_URI;
+    const platform = request.nextUrl.searchParams.get("platform") || "google_analytics";
 
     if (!clientId || !redirectUri) {
       return NextResponse.json(
@@ -24,6 +25,7 @@ export async function GET(request: NextRequest) {
       scope: scopes.join(" "),
       access_type: "offline",
       prompt: "consent",
+      state: platform,
     });
 
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;

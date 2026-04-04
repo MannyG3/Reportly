@@ -6,6 +6,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const code = searchParams.get("code");
     const error = searchParams.get("error");
+    const state = searchParams.get("state") || "google_analytics";
 
     // Handle OAuth errors
     if (error) {
@@ -85,8 +86,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Determine platform from scopes
-    const platform = "google_analytics"; // Or google_ads based on dialog flow
+    // Use state parameter to determine platform (google_analytics or google_ads)
+    const platform = (state === "google_ads" ? "google_ads" : "google_analytics") as "google_analytics" | "google_ads";
 
     const expiresAt = new Date(
       Date.now() + tokens.expires_in * 1000

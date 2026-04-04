@@ -67,7 +67,12 @@ export default function IntegrationsTab({ agencyId }: { agencyId: string }) {
   const handleConnect = async (platform: string) => {
     setIsConnecting(platform);
     try {
-      const response = await fetch(`/api/integrations/${platform}/connect`);
+      // For Google integrations, pass the platform as a query parameter
+      const url = platform.startsWith("google_")
+        ? `/api/integrations/google/connect?platform=${platform}`
+        : `/api/integrations/${platform}/connect`;
+
+      const response = await fetch(url);
       if (response.ok) {
         const { authUrl } = await response.json();
         window.location.href = authUrl;
@@ -78,7 +83,7 @@ export default function IntegrationsTab({ agencyId }: { agencyId: string }) {
       console.error("Connection error:", err);
       alert("An error occurred while connecting");
     } finally {
-      setIsConnecting(platform);
+      setIsConnecting(null);
     }
   };
 
