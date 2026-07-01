@@ -5,6 +5,15 @@ import type { Database } from "@/types";
 
 type TypedSupabaseClient = SupabaseClient<Database>;
 
+function isPlaceholderSupabaseValue(value: string) {
+  return (
+    value.includes("your-project") ||
+    value.includes("your-anon-key") ||
+    value.includes("your-service-role-key") ||
+    value.includes("<your-")
+  );
+}
+
 export async function createSupabaseServerClient(): Promise<TypedSupabaseClient> {
   const cookieStore = await cookies();
 
@@ -14,6 +23,12 @@ export async function createSupabaseServerClient(): Promise<TypedSupabaseClient>
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
       "Missing Supabase environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY."
+    );
+  }
+
+  if (isPlaceholderSupabaseValue(supabaseUrl) || isPlaceholderSupabaseValue(supabaseAnonKey)) {
+    throw new Error(
+      "Supabase environment variables are using placeholder values. Update NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in reportly/.env.local with real Supabase credentials."
     );
   }
 
@@ -57,6 +72,12 @@ export function getSupabaseServiceRoleClient(): TypedSupabaseClient {
   if (!supabaseUrl || !serviceRoleKey) {
     throw new Error(
       "Missing Supabase environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY."
+    );
+  }
+
+  if (isPlaceholderSupabaseValue(supabaseUrl) || isPlaceholderSupabaseValue(serviceRoleKey)) {
+    throw new Error(
+      "Supabase environment variables are using placeholder values. Update NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in reportly/.env.local with real Supabase credentials."
     );
   }
 

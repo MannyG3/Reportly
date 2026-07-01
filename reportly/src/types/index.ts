@@ -166,7 +166,7 @@ export interface Database {
         Row: {
           id: string;
           agency_id: string;
-          platform: "google_analytics" | "google_ads";
+          platform: "google_analytics" | "google_ads" | "meta_ads";
           access_token: string;
           refresh_token: string | null;
           token_expires_at: string | null;
@@ -174,7 +174,7 @@ export interface Database {
         Insert: {
           id?: string;
           agency_id: string;
-          platform: "google_analytics" | "google_ads";
+          platform: "google_analytics" | "google_ads" | "meta_ads";
           access_token: string;
           refresh_token?: string | null;
           token_expires_at?: string | null;
@@ -182,7 +182,7 @@ export interface Database {
         Update: {
           id?: string;
           agency_id?: string;
-          platform?: "google_analytics" | "google_ads";
+          platform?: "google_analytics" | "google_ads" | "meta_ads";
           access_token?: string;
           refresh_token?: string | null;
           token_expires_at?: string | null;

@@ -309,3 +309,72 @@ body::before {
     padding: 1.25rem 0.85rem;
   }
 }
+
+/* Print optimization styling for client reports */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt !important;
+    cursor: auto !important;
+  }
+  
+  body::before,
+  #global-mac-cursor,
+  #global-mac-cursor-dot {
+    display: none !important;
+  }
+
+  .mac-card {
+    background: transparent !important;
+    border: 1px solid #d4d4d4 !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    margin-bottom: 20px !important;
+    page-break-inside: avoid !important;
+  }
+
+  .mac-card-subtle {
+    background: transparent !important;
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 6px !important;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+
+  .print\:border {
+    border: 1px solid #d4d4d4 !important;
+  }
+
+  .print\:text-black {
+    color: black !important;
+  }
+
+  .print\:bg-neutral-50 {
+    background-color: #f9f9f9 !important;
+  }
+
+  h1, h2, h3, p, td, th, span {
+    color: black !important;
+  }
+
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+  }
+
+  th, td {
+    border-bottom: 1px solid #e5e5e5 !important;
+    color: black !important;
+  }
+  
+  .recharts-responsive-container {
+    width: 100% !important;
+    height: 250px !important;
+  }
+}
+

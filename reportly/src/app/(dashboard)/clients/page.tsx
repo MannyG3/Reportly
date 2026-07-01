@@ -1,30 +1,6 @@
-import { redirect } from "next/navigation";
 import ClientsView from "@/components/clients/ClientsView";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getAgencyIdForAuthedUser } from "@/lib/auth";
 
-async function getAgencyIdForAuthedUser() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    redirect("/login");
-  }
-
-  const { data: dbUser, error: dbUserError } = await supabase
-    .from("users")
-    .select("agency_id")
-    .eq("id", user.id)
-    .single();
-
-  if (dbUserError || !dbUser) {
-    redirect("/login");
-  }
-
-  return { supabase, agencyId: dbUser.agency_id };
-}
 export default async function ClientsPage() {
   const { supabase, agencyId } = await getAgencyIdForAuthedUser();
 
@@ -49,4 +25,3 @@ export default async function ClientsPage() {
 
   return <ClientsView initialClients={clients ?? []} />;
 }
-

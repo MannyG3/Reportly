@@ -4,6 +4,15 @@ import type { Database } from "@/types";
 
 let browserClient: SupabaseClient<Database> | null = null;
 
+function isPlaceholderSupabaseValue(value: string) {
+  return (
+    value.includes("your-project") ||
+    value.includes("your-anon-key") ||
+    value.includes("your-service-role-key") ||
+    value.includes("<your-")
+  );
+}
+
 function stripInvalidPublishableAuthorization(init?: RequestInit) {
   if (!init?.headers) return init;
 
@@ -28,6 +37,12 @@ export function getBrowserSupabaseClient(): SupabaseClient<Database> {
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
       "Missing Supabase environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY."
+    );
+  }
+
+  if (isPlaceholderSupabaseValue(supabaseUrl) || isPlaceholderSupabaseValue(supabaseAnonKey)) {
+    throw new Error(
+      "Supabase environment variables are using placeholder values. Update NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in reportly/.env.local with real Supabase credentials."
     );
   }
 
