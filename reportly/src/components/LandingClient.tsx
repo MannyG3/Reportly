@@ -1,5 +1,6 @@
 "use client"
 import { useEffect } from "react"
+import Link from "next/link"
 import ThemeToggle from "@/components/ThemeToggle"
 
 export default function LandingClient() {
@@ -464,7 +465,7 @@ export default function LandingClient() {
       {/* Nav */}
       <div id="nav-container">
         <nav id="main-nav">
-          <a href="/" className="logo"><span className="logo-dot"></span>Reportly</a>
+          <Link href="/" className="logo"><span className="logo-dot"></span>Reportly</Link>
           <div className="nav-mid">
             <a href="#product">Product</a>
             <a href="#features">Features</a>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createBrowserClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types";
@@ -33,7 +34,7 @@ export function getBrowserSupabaseClient(): SupabaseClient<Database> {
     process.env.NEXT_PUBLIC_OFFLINE_MODE === "true" ||
     (typeof document !== "undefined" && document.cookie.includes("is_demo=true"))
   ) {
-    return getMockSupabaseClient() as any;
+    return getMockSupabaseClient() as unknown as SupabaseClient<Database>;
   }
 
   if (browserClient) return browserClient;

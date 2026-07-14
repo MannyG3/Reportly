@@ -1,6 +1,25 @@
 import Stripe from "stripe";
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types";
+
+type SubscriptionStatus = Database["public"]["Tables"]["subscriptions"]["Insert"]["status"];
+
+const SUBSCRIPTION_STATUSES: SubscriptionStatus[] = [
+  "incomplete",
+  "incomplete_expired",
+  "trialing",
+  "active",
+  "past_due",
+  "canceled",
+  "unpaid",
+];
+
+export function mapStripeSubscriptionStatus(status: Stripe.Subscription.Status): SubscriptionStatus {
+  if (SUBSCRIPTION_STATUSES.includes(status as SubscriptionStatus)) {
+    return status as SubscriptionStatus;
+  }
+  return "incomplete";
+}
 
 function getStripeClient() {
   const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -90,7 +109,7 @@ export async function createSubscriptionForAgency(
         stripe_customer_id: customer.id,
         stripe_subscription_id: subscription.id,
         plan,
-        status: subscription.status as any,
+        status: mapStripeSubscriptionStatus(subscription.status),
         current_period_end: periodEndUnix
           ? new Date(periodEndUnix * 1000).toISOString()
           : null,
@@ -169,6 +188,8 @@ export async function updateSubscriptionPlan(
       supabaseServiceRoleKey
     );
 
+type SubscriptionRow = Database["public"]["Tables"]["subscriptions"]["Row"];
+
     // Get current subscription
     const { data: subscription, error: fetchError } = await supabase
       .from("subscriptions")
@@ -179,6 +200,8 @@ export async function updateSubscriptionPlan(
     if (fetchError || !subscription) {
       throw new Error("Subscription not found");
     }
+
+    const currentSubscription = subscription as SubscriptionRow;
 
     // Update Stripe subscription
     const priceIds: Record<string, string> = {
@@ -191,12 +214,20 @@ export async function updateSubscriptionPlan(
         "price_enterprise_placeholder",
     };
 
+    const stripeSubscription = await stripe.subscriptions.retrieve(
+      currentSubscription.stripe_subscription_id
+    );
+    const subscriptionItemId = stripeSubscription.items.data[0]?.id;
+    if (!subscriptionItemId) {
+      throw new Error("Stripe subscription has no items");
+    }
+
     const updatedSubscription = await stripe.subscriptions.update(
-      subscription.stripe_subscription_id,
+      currentSubscription.stripe_subscription_id,
       {
         items: [
           {
-            id: (subscription as any).stripe_subscription_item_id,
+            id: subscriptionItemId,
             price: priceIds[newPlan],
           },
         ],
@@ -211,7 +242,7 @@ export async function updateSubscriptionPlan(
       .from("subscriptions")
       .update({
         plan: newPlan,
-        status: updatedSubscription.status as any,
+        status: mapStripeSubscriptionStatus(updatedSubscription.status),
       })
       .eq("agency_id", agencyId)
       .select()

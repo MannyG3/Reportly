@@ -358,7 +358,7 @@ function SettingsContent() {
                   placeholder="https://example.com/logo.png"
                 />
                 <p className="text-[10px] text-neutral-500">
-                  Full URL to your agency's logo image (displayed on shared client reports).
+                  Full URL to your agency&apos;s logo image (displayed on shared client reports).
                 </p>
               </div>
 

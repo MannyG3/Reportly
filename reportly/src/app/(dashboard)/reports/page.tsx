@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { getSupabaseServiceRoleClient } from "@/lib/supabase/server";
 import { getAgencyIdForAuthedUser } from "@/lib/auth";
 import type { Json } from "@/types";
-import { Copy, Check, ExternalLink } from "lucide-react";
 import ReportsViewClient from "@/components/reports/ReportsViewClient";
 
 function getString(formData: FormData, key: string) {
@@ -233,28 +232,6 @@ async function deleteReportAction(formData: FormData) {
   }
 }
 
-function StatusPill({ status }: { status: string }) {
-  const styles =
-    status === "ready"
-      ? "border-emerald-900/60 bg-emerald-950/25 text-emerald-200"
-      : status === "generating"
-        ? "border-amber-900/60 bg-amber-950/25 text-amber-200"
-        : status === "failed"
-          ? "border-red-900/60 bg-red-950/25 text-red-200"
-          : "border-neutral-800 bg-neutral-950 text-neutral-300";
-
-  return (
-    <span
-      className={[
-        "inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-medium",
-        styles,
-      ].join(" ")}
-    >
-      {status}
-    </span>
-  );
-}
-
 export default async function ReportsPage({
   searchParams,
 }: {
@@ -301,8 +278,6 @@ export default async function ReportsPage({
       </div>
     );
   }
-
-  const clientMap = new Map((clients ?? []).map((c) => [c.id, c.name] as const));
 
   // Determine active integration flags
   const connectedPlatforms = new Set((integrations ?? []).map((i) => i.platform));

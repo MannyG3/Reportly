@@ -12,7 +12,6 @@ import {
   ExternalLink,
   Copy,
   Check,
-  TrendingUp,
 } from "lucide-react";
 import {
   LineChart,
@@ -136,7 +135,7 @@ export default function DashboardOverviewClient({
       <div>
         <h1 className="mac-title text-2xl md:text-3xl">Dashboard</h1>
         <p className="mt-1 text-sm text-[var(--muted)]">
-          Welcome back. Here is an overview of your agency's reporting performance.
+          Welcome back. Here is an overview of your agency&apos;s reporting performance.
         </p>
       </div>
 
@@ -223,7 +222,7 @@ export default function DashboardOverviewClient({
               {/* Metric filter select */}
               <select
                 value={activeMetric}
-                onChange={(e) => setActiveMetric(e.target.value as any)}
+                onChange={(e) => setActiveMetric(e.target.value as "all" | "reports" | "views")}
                 className="mac-select py-1.5 px-3 text-xs bg-[var(--input-bg)] border-[var(--input-border)] text-[var(--foreground)] w-28"
               >
                 <option value="all">All Metrics</option>

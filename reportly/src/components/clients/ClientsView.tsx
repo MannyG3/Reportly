@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
-import { ExternalLink, Users, FileText, UserCheck } from "lucide-react";
+import { ExternalLink, FileText, UserCheck } from "lucide-react";
 import AddClientModal from "@/components/clients/AddClientModal";
 import EditClientModal from "@/components/clients/EditClientModal";
 import { getBrowserSupabaseClient } from "@/lib/supabase/client";
@@ -11,6 +11,14 @@ type ClientItem = {
   id: string;
   name: string;
   email: string | null;
+  created_at: string;
+};
+
+type ClientReport = {
+  id: string;
+  title: string;
+  status: string;
+  share_token: string | null;
   created_at: string;
 };
 
@@ -41,7 +49,7 @@ export default function ClientsView({ initialClients }: ClientsViewProps) {
 
   // Client detail drawer states
   const [selectedClient, setSelectedClient] = useState<ClientItem | null>(null);
-  const [clientReports, setClientReports] = useState<any[]>([]);
+  const [clientReports, setClientReports] = useState<ClientReport[]>([]);
   const [loadingReports, setLoadingReports] = useState(false);
 
   const hasClients = clients.length > 0;
@@ -161,7 +169,7 @@ export default function ClientsView({ initialClients }: ClientsViewProps) {
       <header className="flex items-center justify-between gap-4">
         <div>
           <h1 className="mac-title">Clients</h1>
-          <p className="mt-1 text-sm text-[var(--muted)]">Manage your agency's clients and their custom report properties.</p>
+          <p className="mt-1 text-sm text-[var(--muted)]">Manage your agency&apos;s clients and their custom report properties.</p>
         </div>
         <button type="button" className="mac-btn-primary text-xs" onClick={() => setShowAdd(true)}>
           Add Client

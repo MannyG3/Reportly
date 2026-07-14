@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types";
+import { mapStripeSubscriptionStatus } from "@/lib/stripe/server";
 
 function getStripeClient() {
   const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest) {
         const customerId = subscription.customer as string;
 
         // Find agency by Stripe customer ID
-        const { data: agency, error: agencyError } = await supabase
+        const { data: agency } = await supabase
           .from("subscriptions")
           .select("agency_id")
           .eq("stripe_customer_id", customerId)
@@ -103,7 +104,7 @@ export async function POST(req: NextRequest) {
             .update({
               stripe_subscription_id: subscription.id,
               plan,
-              status: subscription.status as any,
+              status: mapStripeSubscriptionStatus(subscription.status),
               current_period_end: currentPeriodEnd,
             })
             .eq("agency_id", agency.agency_id);

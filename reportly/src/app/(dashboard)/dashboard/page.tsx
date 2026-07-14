@@ -1,6 +1,17 @@
 import { getAgencyIdForAuthedUser } from "@/lib/auth";
 import DashboardOverviewClient from "@/components/dashboard/DashboardOverviewClient";
 
+type RecentReportRow = {
+  id: string;
+  title: string;
+  status: string;
+  share_token: string | null;
+  generated_at: string | null;
+  created_at: string;
+  client_id: string;
+  clients?: { name: string } | null;
+};
+
 export default async function DashboardHomePage() {
   const { supabase, agencyId } = await getAgencyIdForAuthedUser();
 
@@ -50,10 +61,10 @@ export default async function DashboardHomePage() {
 
   // Map client names directly from joined query to avoid another DB round-trip!
   const clientMap: Record<string, string> = {};
-  const cleanedReports: any[] = [];
+  const cleanedReports: RecentReportRow[] = [];
 
   if (recentReports) {
-    recentReports.forEach((r: any) => {
+    (recentReports as RecentReportRow[]).forEach((r) => {
       cleanedReports.push({
         id: r.id,
         title: r.title,
@@ -64,7 +75,7 @@ export default async function DashboardHomePage() {
         client_id: r.client_id,
       });
       if (r.clients && typeof r.clients === "object") {
-        clientMap[r.client_id] = (r.clients as any).name || "Unknown Client";
+        clientMap[r.client_id] = r.clients.name || "Unknown Client";
       }
     });
   }
@@ -81,7 +92,7 @@ export default async function DashboardHomePage() {
     // Simulate counts relative to current reports count for beautiful distribution
     const baseReports = Math.max(1, Math.round((totalReports ?? 0) * (1 - (i * 0.15))));
     const reportsCount = i === 0 ? (reportsThisMonth ?? 0) : baseReports;
-    const viewsCount = reportsCount * 12 + Math.floor(Math.random() * 20);
+    const viewsCount = reportsCount * 12 + ((i * 7 + 3) % 20);
 
     chartData.push({
       month: label,

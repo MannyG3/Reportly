@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -16,13 +17,13 @@ function isPlaceholderSupabaseValue(value: string) {
 
 export async function createSupabaseServerClient(): Promise<TypedSupabaseClient> {
   if (process.env.OFFLINE_MODE === "true") {
-    return getMockSupabaseClient() as any;
+    return getMockSupabaseClient() as unknown as TypedSupabaseClient;
   }
 
   const cookieStore = await cookies();
 
   if (cookieStore.get("is_demo")?.value === "true") {
-    return getMockSupabaseClient() as any;
+    return getMockSupabaseClient() as unknown as TypedSupabaseClient;
   }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -71,7 +72,7 @@ export async function createSupabaseServerClient(): Promise<TypedSupabaseClient>
 
 export function getSupabaseServiceRoleClient(): TypedSupabaseClient {
   if (process.env.OFFLINE_MODE === "true") {
-    return getMockSupabaseClient() as any;
+    return getMockSupabaseClient() as unknown as TypedSupabaseClient;
   }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
