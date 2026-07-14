@@ -100,6 +100,8 @@ cd reportly
 npx vercel --prod
 ```
 
+Or deploy from the repository root — the root `vercel.json` runs install/build inside `reportly`. For the most reliable setup, set **Root Directory** to `reportly` in Vercel Project Settings → Build and Deployment.
+
 ## Notes
 
 - The deployable application root is [reportly](reportly), not the repository root.

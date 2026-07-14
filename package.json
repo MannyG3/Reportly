@@ -1,0 +1,13 @@
+{
+  "name": "reportly-root",
+  "private": true,
+  "scripts": {
+    "build": "npm run build --prefix reportly",
+    "dev": "npm run dev --prefix reportly",
+    "start": "npm run start --prefix reportly",
+    "lint": "npm run lint --prefix reportly"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}

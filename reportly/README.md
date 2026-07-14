@@ -66,6 +66,16 @@ Deploy from this folder:
 npx vercel --prod
 ```
 
+### Vercel project settings
+
+If the Vercel project is linked to the GitHub repository root (not this folder), set **Root Directory** to `reportly` in Project Settings → Build and Deployment. The repo also includes a root `vercel.json` that runs install/build in this folder when Root Directory is not configured.
+
+Required environment variables in Vercel:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
 If environment variables are changed in Vercel, redeploy to apply them.
 
 ## More setup details
