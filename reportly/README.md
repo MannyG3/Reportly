@@ -68,7 +68,12 @@ npx vercel --prod
 
 ### Vercel project settings
 
-If the Vercel project is linked to the GitHub repository root (not this folder), set **Root Directory** to `reportly` in Project Settings → Build and Deployment. The repo also includes a root `vercel.json` that runs install/build in this folder when Root Directory is not configured.
+In [Vercel Project Settings → Build and Deployment](https://vercel.com/docs/builds/configure-a-build#root-directory), set:
+
+- **Root Directory:** `reportly`
+- **Framework Preset:** Next.js
+- **Build Command:** leave default (`next build`)
+- **Output Directory:** leave default (do not override)
 
 Required environment variables in Vercel:
 

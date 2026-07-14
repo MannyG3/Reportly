@@ -93,14 +93,12 @@ cd reportly
 npm run build
 ```
 
-Deploy to Vercel from app folder:
+Deploy to Vercel with **Root Directory** set to `reportly` in Project Settings → Build and Deployment. See [reportly/README.md](reportly/README.md) for full deployment steps.
 
 ```bash
 cd reportly
 npx vercel --prod
 ```
-
-Or deploy from the repository root — the root `vercel.json` runs install/build inside `reportly`. For the most reliable setup, set **Root Directory** to `reportly` in Vercel Project Settings → Build and Deployment.
 
 ## Notes
 
