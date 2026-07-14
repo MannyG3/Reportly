@@ -1,5 +1,6 @@
 "use client"
 import { useEffect } from "react"
+import ThemeToggle from "@/components/ThemeToggle"
 
 export default function LandingClient() {
   useEffect(() => {
@@ -11,11 +12,13 @@ export default function LandingClient() {
     document.querySelectorAll('.reveal').forEach(el => obs.observe(el))
 
     // Navbar scroll
-    const nav = document.getElementById('main-nav')
+    const navContainer = document.getElementById('nav-container')
     const handleScroll = () => {
-      if (nav) nav.style.background = window.scrollY > 20
-        ? 'rgba(10,10,10,0.92)'
-        : 'rgba(10,10,10,0.75)'
+      if (window.scrollY > 20) {
+        navContainer?.classList.add('scrolled')
+      } else {
+        navContainer?.classList.remove('scrolled')
+      }
     }
     window.addEventListener('scroll', handleScroll)
 
@@ -31,23 +34,14 @@ export default function LandingClient() {
         /* ---- RESET ---- */
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-        /* ---- TOKENS ---- */
-        :root{
-          --black:#0a0a0a;--off-black:#111110;--dark:#1c1c1a;--mid:#3a3a38;
-          --muted:#6b6b68;--subtle:#a8a8a4;--line:rgba(255,255,255,0.08);
-          --white:#ffffff;--off-white:#f8f7f4;--cream:#f2f0eb;
-          --gold:#c9a84c;--gold-dim:rgba(201,168,76,0.15);
-          --sf:'-apple-system','BlinkMacSystemFont','SF Pro Display','SF Pro Text','Helvetica Neue',sans-serif;
-          --serif:'Instrument Serif',Georgia,serif;
-        }
-
         /* ---- BASE ---- */
         html{scroll-behavior:smooth}
         body{
           font-family:var(--sf);
-          background:var(--black);color:var(--white);font-size:16px;line-height:1.6;
+          background:var(--background);color:var(--foreground);font-size:16px;line-height:1.6;
           overflow-x:hidden;-webkit-font-smoothing:antialiased;
           -moz-osx-font-smoothing:grayscale;
+          transition: background-color 0.25s ease, color 0.25s ease;
         }
         body::before{
           content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
@@ -56,46 +50,63 @@ export default function LandingClient() {
         }
 
         /* ---- NAV ---- */
+        #nav-container {
+          position:fixed;top:20px;left:50%;transform:translateX(-50%);
+          width:calc(100% - 2.5rem);max-width:920px;z-index:100;
+          transition:all .3s cubic-bezier(0.16,1,0.3,1);
+        }
         nav{
-          position:fixed;top:0;left:0;right:0;z-index:100;
           display:flex;align-items:center;justify-content:space-between;
-          padding:0 3rem;height:64px;
-          border-bottom:1px solid var(--line);
-          background:rgba(10,10,10,0.75);
+          padding:0.45rem 1.5rem;border-radius:9999px;
+          border:1px solid var(--card-border);
+          background:var(--sidebar-bg);
           backdrop-filter:blur(24px) saturate(200%);
           -webkit-backdrop-filter:blur(24px) saturate(200%);
-          transition:background .3s ease;
+          box-shadow:0 8px 32px var(--card-shadow);
+          transition:all .3s cubic-bezier(0.16,1,0.3,1);
+        }
+        #nav-container.scrolled {
+          top:12px;
+        }
+        #nav-container.scrolled nav {
+          background:var(--background);
+          border-color:var(--card-border);
+          box-shadow:0 12px 40px var(--card-shadow);
         }
         .logo{
-          font-family:var(--sf);font-size:1.1rem;font-weight:600;
-          letter-spacing:-0.02em;color:var(--white);text-decoration:none;
+          font-family:var(--sf);font-size:1.05rem;font-weight:600;
+          letter-spacing:-0.02em;color:var(--foreground);text-decoration:none;
           display:flex;align-items:center;gap:8px;
+          transition:opacity .15s ease;
         }
+        .logo:hover{opacity:0.85}
         .logo-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold);flex-shrink:0}
-        .nav-mid{display:flex;gap:2rem}
+        .nav-mid{display:flex;gap:1.25rem}
         .nav-mid a{
-          font-size:0.8125rem;font-weight:400;color:var(--subtle);
-          text-decoration:none;transition:color .15s ease;
-          letter-spacing:-0.01em;
+          font-size:0.8125rem;font-weight:450;color:var(--subtle);
+          text-decoration:none;letter-spacing:-0.01em;
+          padding:.35rem .75rem;border-radius:9999px;
+          transition:all .2s ease;
         }
-        .nav-mid a:hover{color:var(--white)}
+        .nav-mid a:hover{color:var(--foreground);background:var(--sidebar-active-bg)}
         .nav-r{display:flex;align-items:center;gap:10px}
         .btn-gs{
           font-size:0.8125rem;color:var(--subtle);text-decoration:none;
-          padding:.4rem 1rem;border-radius:7px;
-          border:1px solid rgba(255,255,255,.1);
-          transition:all .15s ease;background:transparent;
-          font-family:var(--sf);font-weight:400;
+          padding:.45rem 1.1rem;border-radius:9999px;
+          border:1px solid var(--card-border);
+          transition:all .2s ease;background:transparent;
+          font-family:var(--sf);font-weight:500;
           -webkit-font-smoothing:antialiased;
         }
-        .btn-gs:hover{color:var(--white);border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.05)}
+        .btn-gs:hover{color:var(--foreground);border-color:var(--foreground);background:var(--sidebar-active-bg)}
         .btn-nc{
-          font-size:0.8125rem;font-weight:500;color:var(--black);
-          background:var(--white);padding:.45rem 1.1rem;border-radius:7px;
-          text-decoration:none;transition:all .15s ease;
+          font-size:0.8125rem;font-weight:550;color:var(--black);
+          background:var(--white);padding:.45rem 1.25rem;border-radius:9999px;
+          text-decoration:none;transition:all .2s ease;
           font-family:var(--sf);letter-spacing:-0.01em;
+          box-shadow:0 4px 12px var(--card-shadow);
         }
-        .btn-nc:hover{background:var(--off-white);transform:translateY(-1px);box-shadow:0 4px 16px rgba(255,255,255,0.1)}
+        .btn-nc:hover{background:var(--off-white);transform:translateY(-1px);box-shadow:0 6px 16px var(--gold-dim)}
         .btn-nc:active{transform:translateY(0) scale(0.98)}
 
         /* ---- HERO ---- */
@@ -278,52 +289,68 @@ export default function LandingClient() {
           font-family:var(--serif);font-size:clamp(2rem,3.5vw,3rem);
           line-height:1.1;letter-spacing:-.02em;max-width:420px;margin-bottom:3.5rem;
         }
-        .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:2px}
-        .si{
-          padding:2.5rem;border:1px solid rgba(255,255,255,.07);
-          position:relative;overflow:hidden;
-          transition:background .25s ease,transform .3s cubic-bezier(0.34,1.56,0.64,1);
+        .sgrid{
+          display:grid;
+          grid-template-columns:1fr 1fr;
+          gap:20px;
         }
-        .si:hover{background:rgba(255,255,255,.025);transform:scale(1.005)}
-        .si:active{transform:scale(0.998)}
-        .si:nth-child(1){border-radius:16px 0 0 0}
-        .si:nth-child(2){border-radius:0 16px 0 0}
-        .si:nth-child(3){border-radius:0 0 0 16px}
-        .si:nth-child(4){border-radius:0 0 16px 0}
+        .si{
+          padding:2.5rem;
+          background:rgba(255,255,255,0.015);
+          border:1px solid rgba(255,255,255,.05);
+          border-radius:12px;
+          position:relative;
+          overflow:hidden;
+          transition:all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .si:hover{
+          background:rgba(255,255,255,0.03);
+          border-color:rgba(255,255,255,0.12);
+          transform:translateY(-2px);
+          box-shadow:0 8px 30px rgba(0,0,0,0.3);
+        }
         .sn{
           font-family:var(--serif);font-size:5rem;font-weight:400;
-          color:rgba(255,255,255,.035);line-height:1;
+          color:rgba(255,255,255,.015);line-height:1;
           position:absolute;top:1rem;right:1.5rem;
           pointer-events:none;user-select:none;
         }
         .siw{
-          width:40px;height:40px;border-radius:10px;
-          border:1px solid rgba(255,255,255,.1);
+          width:42px;height:42px;border-radius:8px;
+          border:1px solid rgba(255,255,255,.08);
           display:flex;align-items:center;justify-content:center;
-          margin-bottom:1.25rem;font-size:.95rem;
-          background:rgba(255,255,255,.03);
+          margin-bottom:1.5rem;
+          background:rgba(255,255,255,.02);
+          color:var(--gold);
         }
         .si h3{
-          font-family:var(--serif);font-size:1.15rem;font-weight:400;
-          margin-bottom:.625rem;letter-spacing:-.01em;
+          font-family:var(--sf);font-weight:500;font-size:1.2rem;
+          margin-bottom:.5rem;letter-spacing:-.01em;
         }
-        .si p{font-size:.875rem;color:var(--muted);line-height:1.7;font-weight:300;font-family:var(--sf)}
+        .si p{font-size:.875rem;color:var(--subtle);line-height:1.65;font-weight:300;font-family:var(--sf)}
 
         /* ---- FEATURES ---- */
         .feat-sec{padding:7rem 3rem;border-top:1px solid var(--line)}
         .feat-inner{max-width:1100px;margin:0 auto}
         .feat-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:3.5rem}
         .feat-h{font-family:var(--serif);font-size:clamp(2rem,3.5vw,3rem);line-height:1.1;letter-spacing:-.02em}
-        .fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.06);border-radius:16px;overflow:hidden}
+        .fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
         .fc{
-          background:var(--off-black);padding:2rem 1.75rem;
-          transition:background .2s ease,transform .2s cubic-bezier(0.34,1.56,0.64,1);
+          background:rgba(255,255,255,0.015);
+          border:1px solid rgba(255,255,255,0.05);
+          border-radius:12px;
+          padding:2.25rem 1.75rem;
+          transition:all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .fc:hover{background:#161614;transform:scale(1.01)}
-        .fc:active{transform:scale(0.99)}
-        .fn{font-size:.68rem;color:var(--muted);letter-spacing:.06em;margin-bottom:1.5rem;font-family:var(--sf)}
-        .ft{font-family:var(--serif);font-size:1.05rem;font-weight:400;margin-bottom:.5rem}
-        .fd{font-size:.8125rem;color:var(--muted);line-height:1.7;font-weight:300;font-family:var(--sf)}
+        .fc:hover{
+          background:rgba(255,255,255,0.03);
+          border-color:rgba(255,255,255,0.12);
+          transform:translateY(-2px);
+          box-shadow:0 8px 30px rgba(0,0,0,0.3);
+        }
+        .fn{font-size:.68rem;color:var(--gold);letter-spacing:.06em;margin-bottom:1.25rem;font-family:var(--sf);font-weight:500}
+        .ft{font-family:var(--sf);font-weight:500;font-size:1.15rem;margin-bottom:.5rem;letter-spacing:-.01em}
+        .fd{font-size:.85rem;color:var(--subtle);line-height:1.6;font-weight:300;font-family:var(--sf)}
 
         /* ---- PRICING ---- */
         .price-sec{padding:7rem 3rem;border-top:1px solid var(--line)}
@@ -435,25 +462,27 @@ export default function LandingClient() {
       `}</style>
 
       {/* Nav */}
-      <nav id="main-nav">
-        <a href="/" className="logo"><span className="logo-dot"></span>Reportly</a>
-        <div className="nav-mid">
-          <a href="#product">Product</a>
-          <a href="#features">Features</a>
-          <a href="#pricing">Pricing</a>
-        </div>
-        <div className="nav-r">
-          <a href="/login" className="btn-gs">Sign in</a>
-          <a href="/signup" className="btn-nc">Start free trial</a>
-        </div>
-      </nav>
+      <div id="nav-container">
+        <nav id="main-nav">
+          <a href="/" className="logo"><span className="logo-dot"></span>Reportly</a>
+          <div className="nav-mid">
+            <a href="#product">Product</a>
+            <a href="#features">Features</a>
+            <a href="#pricing">Pricing</a>
+          </div>
+          <div className="nav-r">
+            <ThemeToggle />
+            <a href="/login" className="btn-gs">Sign in</a>
+            <a href="/signup" className="btn-nc">Start free trial</a>
+          </div>
+        </nav>
+      </div>
 
       {/* Hero */}
       <section className="hero">
         <div className="hero-glow"></div>
         <div className="grid-bg"></div>
         <div className="hero-inner">
-          <div className="badge"><span className="badge-dot"></span>White-label reporting for marketing agencies</div>
           <h1 className="hero-h1">Your reports.<br /><em>Automated.</em><br />Branded.</h1>
           <p className="hero-sub">Most agency owners spend 3+ hours per client building monthly reports. Reportly does it in one click, under your logo, on your domain.</p>
           <div className="hero-ctas">
@@ -536,18 +565,46 @@ export default function LandingClient() {
           </div>
           <div className="sgrid reveal">
             {[
-              {n:'01',i:'🔗',t:'Connect your data',d:'One-click OAuth for Google Analytics 4, Google Ads, and Meta Ads. Authorise once — we handle every pull after that.'},
-              {n:'02',i:'🎨',t:'Brand it as your own',d:'Upload your logo, set your color, point a subdomain at us. Your clients see your name everywhere — ours stays invisible.'},
-              {n:'03',i:'⚡',t:'Generate in one click',d:'Hit generate. We pull the numbers, calculate performance, and build a polished report in seconds.'},
-              {n:'04',i:'📤',t:'Share or schedule',d:'Copy a link, download a PDF, or schedule it — reports auto-send on the 1st of each month while you sleep.'},
-            ].map(s => (
-              <div className="si" key={s.n}>
-                <div className="sn">{s.n}</div>
-                <div className="siw">{s.i}</div>
-                <h3>{s.t}</h3>
-                <p>{s.d}</p>
-              </div>
-            ))}
+              {n:'01',i:'connect',t:'Connect your data',d:'One-click OAuth for Google Analytics 4, Google Ads, and Meta Ads. Authorise once — we handle every pull after that.'},
+              {n:'02',i:'brand',t:'Brand it as your own',d:'Upload your logo, set your color, point a subdomain at us. Your clients see your name everywhere — ours stays invisible.'},
+              {n:'03',i:'generate',t:'Generate in one click',d:'Hit generate. We pull the numbers, calculate performance, and build a polished report in seconds.'},
+              {n:'04',i:'share',t:'Share or schedule',d:'Copy a link, download a PDF, or schedule it — reports auto-send on the 1st of each month while you sleep.'},
+            ].map(s => {
+              let iconSvg = null;
+              if (s.i === 'connect') {
+                iconSvg = (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622a4.5 4.5 0 01-1.242-7.244l4.5-4.5a4.5 4.5 0 016.364 6.364l-1.757 1.757" />
+                  </svg>
+                );
+              } else if (s.i === 'brand') {
+                iconSvg = (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122A3 3 0 0010.5 15h1.1a3 3 0 002.932-2.348l1.055-4.747A3 3 0 0012.657 4.5h-1.162a3 3 0 00-2.932 2.348L7.508 11.594M7 21h10M12 17v4" />
+                  </svg>
+                );
+              } else if (s.i === 'generate') {
+                iconSvg = (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                  </svg>
+                );
+              } else if (s.i === 'share') {
+                iconSvg = (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186l5.302-2.651a2.25 2.25 0 11.83 1.666l-5.3 2.651m0 2.186l5.3 2.651a2.25 2.25 0 11-.83 1.667l-5.3-2.651" />
+                  </svg>
+                );
+              }
+              return (
+                <div className="si" key={s.n}>
+                  <div className="sn">{s.n}</div>
+                  <div className="siw">{iconSvg}</div>
+                  <h3>{s.t}</h3>
+                  <p>{s.d}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

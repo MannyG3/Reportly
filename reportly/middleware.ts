@@ -19,6 +19,10 @@ function isProtectedPath(pathname: string) {
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
+  if (req.cookies.get("is_demo")?.value === "true") {
+    return NextResponse.next();
+  }
+
   if (!isProtectedPath(pathname)) {
     return NextResponse.next();
   }

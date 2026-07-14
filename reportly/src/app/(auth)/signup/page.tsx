@@ -2,6 +2,7 @@
 
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { completeSignup } from "./actions";
 interface SignupFormState {
   agencyName: string;
@@ -103,8 +104,24 @@ export default function SignupPage() {
 
   return (
     <main className="mac-page-center">
-      <div className="mac-shell-sm space-y-8">
+      <div className="mac-shell-sm space-y-6">
+        <div className="flex justify-start">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-xs text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Home
+          </Link>
+        </div>
+
         <div className="text-center space-y-2">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <span className="h-2 w-2 rounded-full bg-[var(--gold)] shadow-[0_0_10px_rgba(201,168,76,0.75)]" />
+            <span className="text-sm font-medium tracking-tight text-[var(--foreground)]">Reportly</span>
+          </div>
           <h1 className="mac-title">
             Create your agency account
           </h1>

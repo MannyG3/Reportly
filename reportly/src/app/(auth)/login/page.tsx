@@ -2,7 +2,9 @@
 
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { getBrowserSupabaseClient } from "@/lib/supabase/client";
+import { TrendingUp } from "lucide-react";
 
 interface LoginFormState {
   email: string;
@@ -80,221 +82,117 @@ export default function LoginPage() {
     }
   }
 
+  async function handleDemoLogin() {
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      document.cookie = "is_demo=true; path=/; max-age=86400";
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      router.push("/dashboard");
+      router.refresh();
+    } catch (err) {
+      console.error(err);
+      setError("Unable to log in as demo user.");
+      setIsSubmitting(false);
+    }
+  }
+
   return (
-    <>
-      <style>{`
-        .auth-container {
-          min-height: 100vh;
-          background: var(--black);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 1rem;
-        }
+    <main className="mac-page-center">
+      <div className="mac-shell-sm space-y-6">
+        <div className="flex justify-start">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-xs text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Home
+          </Link>
+        </div>
 
-        .auth-card {
-          width: 100%;
-          max-width: 380px;
-          background: rgba(255, 255, 255, 0.04);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 16px;
-          padding: 2.5rem;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-        }
+        <div className="text-center space-y-2">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <span className="h-2 w-2 rounded-full bg-[var(--gold)] shadow-[0_0_10px_rgba(201,168,76,0.75)]" />
+            <span className="text-sm font-medium tracking-tight text-[var(--foreground)]">Reportly</span>
+          </div>
+          <h1 className="mac-title">Welcome back</h1>
+          <p className="mac-subtitle">
+            Log in to access your client reports and dashboard.
+          </p>
+        </div>
 
-        .auth-title {
-          font-family: var(--serif);
-          font-size: 1.5rem;
-          font-weight: 400;
-          letter-spacing: -0.02em;
-          margin-bottom: 0.5rem;
-        }
-
-        .auth-subtitle {
-          font-size: 0.875rem;
-          color: var(--muted);
-          font-family: var(--sf);
-          line-height: 1.5;
-        }
-
-        .form-group {
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-        }
-
-        .form-label {
-          font-size: 0.8125rem;
-          font-weight: 500;
-          color: var(--white);
-          font-family: var(--sf);
-          letter-spacing: -0.01em;
-        }
-
-        .form-input {
-          width: 100%;
-          background: rgba(255, 255, 255, 0.06);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 10px;
-          padding: 0.75rem 1rem;
-          font-size: 0.875rem;
-          color: var(--white);
-          font-family: var(--sf);
-          transition: all 0.15s ease;
-        }
-
-        .form-input::placeholder {
-          color: var(--muted);
-        }
-
-        .form-input:focus {
-          outline: none;
-          background: rgba(255, 255, 255, 0.1);
-          border-color: rgba(201, 168, 76, 0.5);
-          box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.1);
-        }
-
-        .error-message {
-          font-size: 0.8125rem;
-          color: #ff6b6b;
-          background: rgba(255, 107, 107, 0.1);
-          border: 1px solid rgba(255, 107, 107, 0.2);
-          border-radius: 10px;
-          padding: 0.75rem 1rem;
-          font-family: var(--sf);
-          line-height: 1.5;
-        }
-
-        .btn-submit {
-          width: 100%;
-          background: var(--gold);
-          color: var(--black);
-          border: none;
-          border-radius: 10px;
-          padding: 0.875rem 1.5rem;
-          font-size: 0.9375rem;
-          font-weight: 600;
-          font-family: var(--sf);
-          letter-spacing: -0.01em;
-          cursor: pointer;
-          transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .btn-submit:hover:not(:disabled) {
-          background: #d4b55e;
-          transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(201, 168, 76, 0.3);
-        }
-
-        .btn-submit:active:not(:disabled) {
-          transform: scale(0.98);
-        }
-
-        .btn-submit:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        .auth-footer {
-          text-align: center;
-          font-size: 0.8125rem;
-          color: var(--muted);
-          font-family: var(--sf);
-        }
-
-        .auth-link {
-          color: var(--white);
-          text-decoration: none;
-          font-weight: 500;
-          transition: color 0.15s ease;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .auth-link:hover {
-          color: var(--gold);
-          border-bottom-color: var(--gold);
-        }
-      `}</style>
-
-      <main className="auth-container">
-        <div style={{ width: "100%", maxWidth: "380px", display: "flex", flexDirection: "column", gap: "2rem" }}>
-          <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginBottom: "1rem" }}>
-              <div
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  borderRadius: "8px",
-                  background: "linear-gradient(135deg, var(--gold) 0%, #a07830 100%)",
-                  boxShadow: "0 0 16px rgba(201, 168, 76, 0.3)",
-                }}
-              />
-              <span style={{ fontFamily: "var(--sf)", fontSize: "1.1rem", fontWeight: "600", letterSpacing: "-0.02em" }}>
-                Reportly
-              </span>
-            </div>
-            <h1 className="auth-title">Welcome back</h1>
-            <p className="auth-subtitle">
-              Log in to access your client reports and dashboard.
-            </p>
+        <form onSubmit={handleSubmit} className="space-y-6 mac-card p-6">
+          <div className="space-y-2">
+            <label htmlFor="email" className="block text-sm font-medium">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              value={form.email}
+              onChange={handleChange("email")}
+              className="mac-input"
+              placeholder="you@agency.com"
+              required
+            />
           </div>
 
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }} className="auth-card">
-            <div className="form-group">
-              <label htmlFor="email" className="form-label">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                value={form.email}
-                onChange={handleChange("email")}
-                className="form-input"
-                placeholder="you@agency.com"
-              />
-            </div>
+          <div className="space-y-2">
+            <label htmlFor="password" className="block text-sm font-medium">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              autoComplete="current-password"
+              value={form.password}
+              onChange={handleChange("password")}
+              className="mac-input"
+              placeholder="••••••••"
+              minLength={8}
+              required
+            />
+          </div>
 
-            <div className="form-group">
-              <label htmlFor="password" className="form-label">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                value={form.password}
-                onChange={handleChange("password")}
-                className="form-input"
-                placeholder="••••••••"
-                minLength={8}
-              />
-            </div>
+          {error && (
+            <p className="mac-alert mac-alert-error">{error}</p>
+          )}
 
-            {error && (
-              <p className="error-message">{error}</p>
-            )}
-
+          <div className="space-y-2 pt-1">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="btn-submit"
+              className="mac-btn-primary w-full disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
             >
               {isSubmitting ? "Logging in..." : "Log in"}
             </button>
-          </form>
+            <button
+              type="button"
+              onClick={handleDemoLogin}
+              disabled={isSubmitting}
+              className="mac-btn-secondary w-full disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-1.5"
+            >
+              <TrendingUp className="w-3.5 h-3.5" />
+              Try with Demo Account
+            </button>
+          </div>
+        </form>
 
-          <p className="auth-footer">
-            New to Reportly?{" "}
-            <a href="/signup" className="auth-link">
-              Create an agency account
-            </a>
-          </p>
-        </div>
-      </main>
-    </>
+        <p className="text-center text-xs text-[var(--muted)]">
+          New to Reportly?{" "}
+          <a
+            href="/signup"
+            className="font-medium text-[var(--white)] hover:text-[var(--gold)] underline underline-offset-4"
+          >
+            Create an agency account
+          </a>
+        </p>
+      </div>
+    </main>
   );
 }
 

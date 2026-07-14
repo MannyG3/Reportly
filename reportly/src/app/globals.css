@@ -7,6 +7,7 @@
 }
 
 :root {
+  /* Default: Dark theme values */
   --black: #0a0a0a;
   --off-black: #111110;
   --dark: #1c1c1a;
@@ -23,6 +24,52 @@
   --serif: 'Instrument Serif', Georgia, serif;
   --background: #0a0a0a;
   --foreground: #ffffff;
+
+  --card-bg: rgba(255, 255, 255, 0.015);
+  --card-border: rgba(255, 255, 255, 0.05);
+  --card-shadow: rgba(0, 0, 0, 0.24);
+  --input-bg: rgba(255, 255, 255, 0.02);
+  --input-border: rgba(255, 255, 255, 0.06);
+  --btn-secondary-bg: rgba(255, 255, 255, 0.015);
+  --btn-secondary-border: rgba(255, 255, 255, 0.06);
+  --btn-secondary-text: #a8a8a4;
+
+  --sidebar-bg: rgba(14, 14, 13, 0.9);
+  --sidebar-active-bg: rgba(255, 255, 255, 0.04);
+  --sidebar-active-border: rgba(255, 255, 255, 0.06);
+  --line-color: rgba(255, 255, 255, 0.08);
+}
+
+:root.light {
+  /* Light theme overrides */
+  --background: #fdfcfb;
+  --foreground: #111111;
+  --black: #ffffff;
+  --off-black: #f9f8f5;
+  --dark: #efece6;
+  --mid: #c7c6c0;
+  --muted: #8c8c88;
+  --subtle: #4b4b48;
+  --line: rgba(0, 0, 0, 0.06);
+  --white: #0a0a0a;
+  --off-white: #111110;
+  --cream: #1c1c1a;
+  --gold: #a67c1e;
+  --gold-dim: rgba(166, 124, 30, 0.08);
+
+  --card-bg: rgba(0, 0, 0, 0.015);
+  --card-border: rgba(0, 0, 0, 0.06);
+  --card-shadow: rgba(0, 0, 0, 0.04);
+  --input-bg: rgba(0, 0, 0, 0.015);
+  --input-border: rgba(0, 0, 0, 0.08);
+  --btn-secondary-bg: rgba(0, 0, 0, 0.015);
+  --btn-secondary-border: rgba(0, 0, 0, 0.08);
+  --btn-secondary-text: #4b4b48;
+
+  --sidebar-bg: rgba(245, 243, 238, 0.9);
+  --sidebar-active-bg: rgba(0, 0, 0, 0.03);
+  --sidebar-active-border: rgba(0, 0, 0, 0.06);
+  --line-color: rgba(0, 0, 0, 0.06);
 }
 
 @theme inline {
@@ -32,37 +79,21 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ffffff;
-  }
-}
-
 html {
   scroll-behavior: smooth;
-  cursor: none;
   -webkit-overflow-scrolling: touch;
 }
 
 body {
-  background: var(--black);
-  color: var(--white);
+  background: var(--background);
+  color: var(--foreground);
   font-family: var(--sf);
   font-size: 16px;
   line-height: 1.6;
-  cursor: none;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-a,
-button,
-input,
-select,
-textarea {
-  cursor: none;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 body::before {
@@ -80,41 +111,7 @@ body::before {
   z-index: 1;
 }
 
-#global-mac-cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 40px;
-  height: 40px;
-  border: 1.5px solid rgba(255, 255, 255, 0.5);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  transition: width 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
-    height 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s,
-    background 0.2s;
-  will-change: transform;
-}
-
-#global-mac-cursor.hovered {
-  width: 56px;
-  height: 56px;
-  background: rgba(201, 168, 76, 0.08);
-  border-color: rgba(201, 168, 76, 0.6);
-}
-
-#global-mac-cursor-dot {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 6px;
-  height: 6px;
-  background: var(--white);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 10000;
-  will-change: transform;
-}
+/* Custom cursor styles removed for standard browser native cursor */
 
 .mac-page {
   padding: 0.25rem 0;
@@ -141,18 +138,20 @@ body::before {
 }
 
 .mac-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(18px) saturate(170%);
-  -webkit-backdrop-filter: blur(18px) saturate(170%);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px var(--card-shadow);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease-in-out;
 }
 
 .mac-card-subtle {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .mac-title {
@@ -172,12 +171,12 @@ body::before {
 .mac-input,
 .mac-select {
   width: 100%;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  padding: 0.72rem 0.92rem;
-  font-size: 0.88rem;
-  color: var(--white);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.84rem;
+  color: var(--foreground);
   font-family: var(--sf);
   transition: all 0.15s ease;
 }
@@ -189,30 +188,31 @@ body::before {
 .mac-input:focus,
 .mac-select:focus {
   outline: none;
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(201, 168, 76, 0.5);
-  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.1);
+  background: var(--input-bg);
+  border-color: var(--foreground);
+  box-shadow: 0 0 0 1px var(--foreground);
 }
 
 .mac-btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 0;
-  border-radius: 10px;
-  padding: 0.75rem 1.2rem;
-  font-size: 0.88rem;
-  font-weight: 600;
+  border: 1px solid rgba(201, 168, 76, 0.2);
+  border-radius: 8px;
+  padding: 0.625rem 1.125rem;
+  font-size: 0.84rem;
+  font-weight: 500;
   letter-spacing: -0.01em;
   color: var(--black);
-  background: var(--gold);
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: linear-gradient(180deg, #dfc168 0%, #c9a84c 100%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: all 0.15s ease-in-out;
 }
 
 .mac-btn-primary:hover {
-  background: #d4b55e;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(201, 168, 76, 0.28);
+  background: linear-gradient(180deg, #e8cb76 0%, #d4b55e 100%);
+  border-color: rgba(201, 168, 76, 0.3);
+  box-shadow: 0 4px 16px rgba(201, 168, 76, 0.15);
 }
 
 .mac-btn-primary:active {
@@ -223,21 +223,21 @@ body::before {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
-  padding: 0.75rem 1.2rem;
-  font-size: 0.88rem;
-  font-weight: 500;
+  border-radius: 8px;
+  padding: 0.625rem 1.125rem;
+  font-size: 0.84rem;
+  font-weight: 450;
   letter-spacing: -0.01em;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: var(--subtle);
-  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--btn-secondary-border);
+  color: var(--btn-secondary-text);
+  background: var(--btn-secondary-bg);
   transition: all 0.15s ease;
 }
 
 .mac-btn-secondary:hover {
-  color: var(--white);
-  border-color: rgba(255, 255, 255, 0.28);
-  background: rgba(255, 255, 255, 0.06);
+  color: var(--foreground);
+  border-color: var(--foreground);
+  background: rgba(128, 128, 128, 0.05);
 }
 
 .mac-btn-secondary:active {
@@ -265,15 +265,16 @@ body::before {
 
 /* Utility classes for common patterns */
 .spring-hover {
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .spring-hover:hover {
-  transform: translateY(-2px) scale(1.02);
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
 }
 
 .spring-hover:active {
-  transform: translateY(0) scale(0.98);
+  opacity: 0.95;
 }
 
 .smooth-fade {
@@ -376,5 +377,20 @@ body::before {
     width: 100% !important;
     height: 250px !important;
   }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 

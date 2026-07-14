@@ -145,12 +145,12 @@ export default function DashboardOverviewClient({
         <article className="mac-card p-5 flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-[var(--muted)]">Total Clients</p>
-            <p className="mt-2 text-3xl font-semibold tracking-tight text-[var(--white)]">
+            <p className="mt-2 text-3xl font-semibold tracking-tight text-[var(--foreground)]">
               {stats.totalClients}
             </p>
           </div>
-          <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
-            <Users className="w-5 h-5" />
+          <div className="p-2.5 rounded-lg bg-[var(--card-bg)] border border-[var(--card-border)] text-[var(--subtle)]">
+            <Users className="w-4 h-4" />
           </div>
         </article>
 
@@ -161,32 +161,32 @@ export default function DashboardOverviewClient({
               {stats.totalReports}
             </p>
           </div>
-          <div className="p-3 rounded-xl bg-[var(--gold-dim)] border border-[rgba(201,168,76,0.3)] text-[var(--gold)]">
-            <FileText className="w-5 h-5" />
+          <div className="p-2.5 rounded-lg bg-[var(--card-bg)] border border-[var(--card-border)] text-[var(--subtle)]">
+            <FileText className="w-4 h-4" />
           </div>
         </article>
 
         <article className="mac-card p-5 flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-[var(--muted)]">This Month</p>
-            <p className="mt-2 text-3xl font-semibold tracking-tight text-emerald-400">
+            <p className="mt-2 text-3xl font-semibold tracking-tight text-[var(--foreground)]">
               {stats.reportsThisMonth}
             </p>
           </div>
-          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-            <Calendar className="w-5 h-5" />
+          <div className="p-2.5 rounded-lg bg-[var(--card-bg)] border border-[var(--card-border)] text-[var(--subtle)]">
+            <Calendar className="w-4 h-4" />
           </div>
         </article>
 
         <article className="mac-card p-5 flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-[var(--muted)]">Connected Integrations</p>
-            <p className="mt-2 text-3xl font-semibold tracking-tight text-purple-400">
+            <p className="mt-2 text-3xl font-semibold tracking-tight text-[var(--foreground)]">
               {stats.activeIntegrations}
             </p>
           </div>
-          <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
-            <Share2 className="w-5 h-5" />
+          <div className="p-2.5 rounded-lg bg-[var(--card-bg)] border border-[var(--card-border)] text-[var(--subtle)]">
+            <Share2 className="w-4 h-4" />
           </div>
         </article>
       </section>
@@ -197,22 +197,22 @@ export default function DashboardOverviewClient({
         <section className="lg:col-span-2 mac-card p-5 lg:p-6 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h2 className="text-base font-medium text-[var(--white)]">Reporting Volume & Reach</h2>
+              <h2 className="text-base font-medium text-[var(--foreground)]">Reporting Volume & Reach</h2>
               <p className="text-xs text-[var(--muted)]">Reports generated and external views over time</p>
             </div>
             
             {/* Filter buttons */}
             <div className="flex items-center gap-3">
               {/* Range select */}
-              <div className="flex rounded-lg border border-white/10 bg-neutral-900/60 p-0.5 text-xs">
+              <div className="flex rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] p-0.5 text-xs">
                 {(["7D", "30D", "6M"] as const).map((r) => (
                   <button
                     key={r}
                     onClick={() => setTimeRange(r)}
-                    className={`px-2.5 py-1 rounded-md transition ${
+                    className={`px-2.5 py-1 rounded-md transition cursor-pointer ${
                       timeRange === r
-                        ? "bg-[var(--gold)] text-black font-semibold"
-                        : "text-neutral-400 hover:text-neutral-200"
+                        ? "bg-[var(--gold)] text-black font-semibold shadow-sm"
+                        : "text-[var(--subtle)] hover:text-[var(--foreground)]"
                     }`}
                   >
                     {r}
@@ -224,7 +224,7 @@ export default function DashboardOverviewClient({
               <select
                 value={activeMetric}
                 onChange={(e) => setActiveMetric(e.target.value as any)}
-                className="mac-select py-1.5 px-3 text-xs bg-neutral-900 border-neutral-800 text-neutral-300 w-28"
+                className="mac-select py-1.5 px-3 text-xs bg-[var(--input-bg)] border-[var(--input-border)] text-[var(--foreground)] w-28"
               >
                 <option value="all">All Metrics</option>
                 <option value="reports">Reports Only</option>
@@ -236,32 +236,32 @@ export default function DashboardOverviewClient({
           <div className="h-64 w-full pt-4">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={displayedChartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--line-color)" />
                 <XAxis
                   dataKey="month"
-                  tick={{ fill: "#8a8a88", fontSize: 11 }}
-                  axisLine={{ stroke: "rgba(255,255,255,0.08)" }}
-                  tickLine={{ stroke: "rgba(255,255,255,0.08)" }}
+                  tick={{ fill: "var(--subtle)", fontSize: 11 }}
+                  axisLine={{ stroke: "var(--line-color)" }}
+                  tickLine={{ stroke: "var(--line-color)" }}
                 />
                 <YAxis
                   yAxisId="left"
-                  tick={{ fill: "#8a8a88", fontSize: 11 }}
-                  axisLine={{ stroke: "rgba(255,255,255,0.08)" }}
-                  tickLine={{ stroke: "rgba(255,255,255,0.08)" }}
+                  tick={{ fill: "var(--subtle)", fontSize: 11 }}
+                  axisLine={{ stroke: "var(--line-color)" }}
+                  tickLine={{ stroke: "var(--line-color)" }}
                 />
                 <YAxis
                   yAxisId="right"
                   orientation="right"
-                  tick={{ fill: "#8a8a88", fontSize: 11 }}
-                  axisLine={{ stroke: "rgba(255,255,255,0.08)" }}
-                  tickLine={{ stroke: "rgba(255,255,255,0.08)" }}
+                  tick={{ fill: "var(--subtle)", fontSize: 11 }}
+                  axisLine={{ stroke: "var(--line-color)" }}
+                  tickLine={{ stroke: "var(--line-color)" }}
                 />
                 <Tooltip
                   contentStyle={{
-                    background: "rgba(14,14,13,0.95)",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    background: "var(--sidebar-bg)",
+                    border: "1px solid var(--card-border)",
                     borderRadius: 12,
-                    color: "#ffffff",
+                    color: "var(--foreground)",
                     fontSize: 12,
                   }}
                 />
@@ -275,6 +275,7 @@ export default function DashboardOverviewClient({
                     strokeWidth={2}
                     dot={{ fill: "var(--gold)", strokeWidth: 1 }}
                     activeDot={{ r: 6 }}
+                    animationDuration={450}
                   />
                 )}
                 {(activeMetric === "all" || activeMetric === "views") && (
@@ -286,6 +287,7 @@ export default function DashboardOverviewClient({
                     stroke="#a855f7"
                     strokeWidth={2}
                     dot={{ fill: "#a855f7", strokeWidth: 1 }}
+                    animationDuration={450}
                   />
                 )}
               </LineChart>
@@ -307,7 +309,7 @@ export default function DashboardOverviewClient({
         {/* Getting Started Checklist */}
         <section className="mac-card p-5 lg:p-6 space-y-4">
           <div>
-            <h2 className="text-base font-medium text-[var(--white)]">Getting Started</h2>
+            <h2 className="text-base font-medium text-[var(--foreground)]">Getting Started</h2>
             <p className="text-xs text-[var(--muted)]">Complete setup to unlock professional features</p>
           </div>
 
@@ -317,22 +319,22 @@ export default function DashboardOverviewClient({
                 key={item.id}
                 className={`flex gap-3 p-3 rounded-xl border transition-colors ${
                   item.completed
-                    ? "bg-neutral-900/20 border-neutral-800/40 text-neutral-400"
-                    : "bg-neutral-900/60 border-neutral-800 text-neutral-200"
+                    ? "bg-[var(--card-bg)]/40 border-[var(--card-border)]/40 text-[var(--subtle)]"
+                    : "bg-[var(--card-bg)] border-[var(--card-border)] text-[var(--foreground)]"
                 }`}
               >
                 <div>
                   {item.completed ? (
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500" />
                   ) : (
-                    <Circle className="w-5 h-5 text-neutral-600" />
+                    <Circle className="w-5 h-5 text-[var(--muted)]" />
                   )}
                 </div>
                 <div className="space-y-1 flex-1">
-                  <p className={`text-xs font-medium leading-none ${item.completed ? "line-through text-neutral-500" : ""}`}>
+                  <p className={`text-xs font-medium leading-none ${item.completed ? "line-through text-[var(--muted)]" : ""}`}>
                     {item.title}
                   </p>
-                  <p className="text-[10px] text-neutral-500 leading-tight">
+                  <p className="text-[10px] text-[var(--muted)] leading-tight">
                     {item.description}
                   </p>
                   {!item.completed && (
@@ -353,14 +355,14 @@ export default function DashboardOverviewClient({
 
       {/* Recent Reports Section */}
       <section className="mac-card overflow-hidden">
-        <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
-          <h2 className="text-base font-medium text-[var(--white)]">Recent Reports</h2>
+        <div className="px-5 py-4 border-b border-[var(--line-color)] flex items-center justify-between">
+          <h2 className="text-base font-medium text-[var(--foreground)]">Recent Reports</h2>
           <Link href="/reports" className="text-xs font-medium text-[var(--gold)] hover:underline">
             View all reports
           </Link>
         </div>
 
-        <div className="divide-y divide-white/10">
+        <div className="divide-y divide-[var(--line-color)]">
           {recentReports.length === 0 ? (
             <div className="px-5 py-10 text-center">
               <p className="text-sm text-neutral-400">No reports generated yet.</p>
@@ -377,25 +379,25 @@ export default function DashboardOverviewClient({
               return (
                 <div
                   key={report.id}
-                  className="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:bg-white/[0.01] transition"
+                  className="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:bg-[rgba(128,128,128,0.02)] transition"
                 >
                   <div className="min-w-0 space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-neutral-100 truncate">
+                      <span className="text-sm font-medium text-[var(--foreground)] truncate">
                         {report.title}
                       </span>
                       <span
                         className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${
                           isReady
-                            ? "border-emerald-900/60 bg-emerald-950/25 text-emerald-300"
-                            : "border-amber-900/60 bg-amber-950/25 text-amber-300"
+                            ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-500"
+                            : "border-amber-500/20 bg-amber-500/10 text-amber-500"
                         }`}
                       >
                         {report.status}
                       </span>
                     </div>
-                    <div className="text-xs text-neutral-500 flex items-center gap-2">
-                      <span>Client: <strong className="text-neutral-400">{clientName}</strong></span>
+                    <div className="text-xs text-[var(--muted)] flex items-center gap-2">
+                      <span>Client: <strong className="text-[var(--subtle)]">{clientName}</strong></span>
                       <span>•</span>
                       <span>
                         Created: {new Date(report.created_at).toLocaleDateString()}
